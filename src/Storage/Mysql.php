@@ -81,12 +81,12 @@ class Mysql implements Storage
             $this -> connect -> query(sprintf($this -> creatTable,$this -> table));
         }
         session_set_save_handler(
-            [$this,'Open'],
-            [$this,'Close'],
-            [$this,'Read'],
-            [$this,'Write'],
-            [$this,'Destroy'],
-            [$this,'Gc']);
+            [&$this,'Open'],
+            [&$this,'Close'],
+            [&$this,'Read'],
+            [&$this,'Write'],
+            [&$this,'Destroy'],
+            [&$this,'Gc']);
         register_shutdown_function('session_write_close');
         $this -> Id();
     }
