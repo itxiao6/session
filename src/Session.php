@@ -22,7 +22,7 @@ class Session
      * 使用驱动
      * @var bool | string
      */
-    protected static $driver = Local::class;
+    protected static $driver = 'Local';
 
     /**
      * 定义session 是否已经启动
