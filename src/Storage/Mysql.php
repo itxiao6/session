@@ -52,7 +52,10 @@ class Mysql implements Storage
             $this -> table = $table_name;
         }
         if($pdo != null){
-            # 直接设置PDO
+            /**
+             * 直接设置PDO
+             */
+            $this -> connect = $pdo;
         }else{
             /**
              * 创建PDO 连接
@@ -67,6 +70,9 @@ class Mysql implements Storage
          * 解析结果集
          */
         $row = $result->fetchAll();
+        /**
+         * 判断表名是否存在
+         */
         if(count($row) !=1){
             /**
              * 建表
