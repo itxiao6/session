@@ -27,12 +27,12 @@ class Mysql implements Storage
      * @var string
      */
     protected $creatTable = "
-        CREATE TABLE '%s' (
-          'skey' char(32) CHARACTER SET ascii NOT NULL,
-          'data' text COLLATE utf8mb4_bin,
-          'expire' int(11) NOT NULL,
-          PRIMARY KEY ('skey'),
-          KEY 'index_session_expire' ('expire') USING BTREE
+        CREATE TABLE %s (
+          skey char(32) CHARACTER SET ascii NOT NULL,
+          data text COLLATE utf8mb4_bin,
+          expire int(11) NOT NULL,
+          PRIMARY KEY (skey),
+          KEY index_session_expire (expire) USING BTREE
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
     ";
 
@@ -203,9 +203,8 @@ class Mysql implements Storage
         if (filter_input(INPUT_GET, session_name()) == '' and
             filter_input(INPUT_COOKIE, session_name()) == '') {
             try {
-                $dbh = getConnection();
-                $stmt = $dbh->query('SELECT uuid() AS uuid');
-                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt = $this -> connect -> query('SELECT uuid() AS uuid');
+                $data = $stmt -> fetch(PDO::FETCH_ASSOC);
                 $data = str_replace('-', '', $data['uuid']);
                 session_id($data);
                 return TRUE;
