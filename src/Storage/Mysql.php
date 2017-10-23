@@ -82,14 +82,14 @@ class Mysql implements Storage
         }
         session_module_name('user');
         session_set_save_handler(
-            [&$this,'Open'],
-            [&$this,'Close'],
-            [&$this,'Read'],
-            [&$this,'Write'],
-            [&$this,'Destroy'],
-            [&$this,'Gc']);
+            [&$this,'open'],
+            [&$this,'close'],
+            [&$this,'read'],
+            [&$this,'write'],
+            [&$this,'destroy'],
+            [&$this,'gc']);
         register_shutdown_function('session_write_close');
-        $this -> Id();
+        $this -> id();
     }
 
     /**
@@ -117,7 +117,7 @@ class Mysql implements Storage
      * @return string
      * @throws Exception
      */
-    public function Read($sessionId) {
+    public function read($sessionId) {
         try {
             $time = time();
             $sql = "SELECT count(*) AS 'count' FROM ".$this -> table
@@ -143,9 +143,10 @@ class Mysql implements Storage
      * 写入session
      * @param $sessionId
      * @param $data
+     * @return bool
      * @throws Exception
      */
-    public function Write($sessionId, $data) {
+    public function write($sessionId, $data) {
         try {
             $expire = time() + get_cfg_var('session.gc_maxlifetime');
 
@@ -153,7 +154,7 @@ class Mysql implements Storage
                 . "values (?, ?, ?) "
                 . "ON DUPLICATE KEY UPDATE data = ?, expire = ?";
             $stmt = $this -> connect ->prepare($sql);
-            $stmt->execute([$sessionId, $data, $expire, $data, $expire]);
+            return (Bool) $stmt->execute([$sessionId, $data, $expire, $data, $expire]);
         } catch (Exception $e) {
             throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
@@ -165,7 +166,7 @@ class Mysql implements Storage
      * @return bool
      * @throws Exception
      */
-    public function Destroy($sessionId) {
+    public function destroy($sessionId) {
         try {
             $sql = "DELETE FROM '{$this -> table}' where skey = ?";
             $stmt = $this -> connect -> prepare($sql);
@@ -182,7 +183,7 @@ class Mysql implements Storage
      * @return bool
      * @throws Exception
      */
-    public function Gc($lifetime) {
+    public function gc($lifetime) {
         try {
             $sql = "DELETE FROM '{$this -> table}' WHERE expire < ?";
             $stmt = $this -> connect -> prepare($sql);
@@ -199,7 +200,7 @@ class Mysql implements Storage
      * @return bool
      * @throws Exception
      */
-    function Id() {
+    function id() {
         if (filter_input(INPUT_GET, session_name()) == '' and
             filter_input(INPUT_COOKIE, session_name()) == '') {
             try {
@@ -221,7 +222,7 @@ class Mysql implements Storage
      * @param $sessionName
      * @return bool
      */
-    public function Open($savePath, $sessionName) {
+    public function open($savePath, $sessionName) {
         return true;
     }
 
@@ -229,7 +230,7 @@ class Mysql implements Storage
      * 关闭session
      * @return bool
      */
-    public function Close() {
+    public function close() {
         return true;
     }
 
