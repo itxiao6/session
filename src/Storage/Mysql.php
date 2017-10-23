@@ -27,7 +27,7 @@ class Mysql implements Storage
      * @var string
      */
     protected $creatTable = "
-        CREATE TABLE 'session' (
+        CREATE TABLE '%s' (
           'skey' char(32) CHARACTER SET ascii NOT NULL,
           'data' text COLLATE utf8mb4_bin,
           'expire' int(11) NOT NULL,
@@ -78,7 +78,7 @@ class Mysql implements Storage
             /**
              * 建表
              */
-            $this -> connect -> query($this -> creatTable);
+            $this -> connect -> query(sprintf($this -> creatTable,$this -> table));
         }
         session_set_save_handler(
             [$this,'Open'],
