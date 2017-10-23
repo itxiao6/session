@@ -80,6 +80,7 @@ class Mysql implements Storage
              */
             $this -> connect -> query(sprintf($this -> creatTable,$this -> table));
         }
+        session_module_name('user');
         session_set_save_handler(
             [&$this,'Open'],
             [&$this,'Close'],
