@@ -101,9 +101,9 @@ class Mysql implements Storage
     public function connection($dns,$user,$pwd) {
         try {
             $this -> connect = new PDO($dns, $user, $pwd, array(
-                PDO::ATTR_PERSISTENT => TRUE,
+                PDO::ATTR_PERSISTENT => true,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_EMULATE_PREPARES => FALSE
+                PDO::ATTR_EMULATE_PREPARES => false
             ));
         } catch (Exception $e) {
             throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
@@ -170,7 +170,7 @@ class Mysql implements Storage
             $sql = "DELETE FROM '{$this -> table}' where skey = ?";
             $stmt = $this -> connect -> prepare($sql);
             $stmt->execute(array($sessionId));
-            return TRUE;
+            return true;
         } catch (Exception $e) {
             throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
@@ -187,8 +187,8 @@ class Mysql implements Storage
             $sql = "DELETE FROM '{$this -> table}' WHERE expire < ?";
             $stmt = $this -> connect -> prepare($sql);
             $stmt->execute([time()]);
-            $dbh = NULL;
-            return TRUE;
+            $dbh = null;
+            return true;
         } catch (Exception $e) {
             throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
@@ -207,7 +207,7 @@ class Mysql implements Storage
                 $data = $stmt -> fetch(PDO::FETCH_ASSOC);
                 $data = str_replace('-', '', $data['uuid']);
                 session_id($data);
-                return TRUE;
+                return true;
             } catch (Exception $e) {
                 throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
             }
