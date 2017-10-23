@@ -122,18 +122,17 @@ class Mysql implements Storage
             $time = time();
             $sql = "SELECT count(*) AS 'count' FROM ".$this -> table
                 ." WHERE skey = ? and expire > ?";
-            $stmt = $this -> connect ->prepare($sql);
+            $stmt = $this -> connect -> prepare($sql);
             $stmt->execute([$sessionId, $time]);
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($data['count'] = 0) {
-                return '';
+                return null;
             }
-
             $sql = "SELECT 'data' FROM ".$this ->table
                 . " WHERE 'skey' = ? and 'expire' > ?";
-            $stmt = $this -> connect->prepare($sql);
+            $stmt = $this -> connect -> prepare($sql);
             $stmt->execute([$sessionId, $time]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            $data = $stmt -> fetch(PDO::FETCH_ASSOC);
             return $data['data'];
         } catch (Exception $e) {
             throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
