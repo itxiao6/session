@@ -1,5 +1,6 @@
 <?php
 namespace Itxiao6\Session\Storage;
+use Itxiao6\Session\Interfaces\Storage;
 use Exception;
 use PDO;
 /**

@@ -1,6 +1,6 @@
 <?php
 namespace Itxiao6\Session\Storage;
-
+use Itxiao6\Session\Interfaces\Storage;
 /**
  * Redis 存储
  * Class Redis
