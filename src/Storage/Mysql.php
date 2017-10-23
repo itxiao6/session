@@ -74,13 +74,12 @@ class Mysql implements Storage
         /**
          * 判断表名是否存在
          */
-        if(count($row) !=1){
+        if(count($row) < 1){
             /**
              * 建表
              */
             $this -> connect -> query(sprintf($this -> creatTable,$this -> table));
         }
-        session_module_name('user');
         session_set_save_handler(
             [&$this,'open'],
             [&$this,'close'],
@@ -88,7 +87,6 @@ class Mysql implements Storage
             [&$this,'write'],
             [&$this,'destroy'],
             [&$this,'gc']);
-        register_shutdown_function('session_write_close');
         $this -> id();
     }
 
