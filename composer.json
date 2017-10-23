@@ -1,0 +1,23 @@
+{
+  "name": "itxiao6/session",
+  "description": "minkenrel session",
+  "keywords": ["minkernel","session", "validation", "file"],
+  "homepage": "http://github.com/itxiao6/session",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Small six",
+      "email": "itxiao6@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Itxiao6\\Session\\": "src/"
+    }
+  }
+}
