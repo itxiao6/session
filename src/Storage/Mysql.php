@@ -87,7 +87,10 @@ class Mysql implements Storage
             [&$this,'write'],
             [&$this,'destroy'],
             [&$this,'gc']);
-        $this -> id();
+        /**
+         * 启动session
+         */
+        session_start();
     }
 
     /**

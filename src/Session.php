@@ -93,10 +93,6 @@ class Session
         new self::$interfaces[self::$driver](...func_get_args());
 
         /**
-         * 启动session
-         */
-        session_start();
-        /**
          * 定义session 已经启动
          */
         self::$session_status = true;

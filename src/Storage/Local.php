@@ -15,7 +15,13 @@ class Local implements Storage
      */
     public function __construct($session_dir = '/tmp')
     {
-        # 修改session文件的储存位置
+        /**
+         * 修改session文件的储存位置
+         */
         session_save_path($session_dir);
+        /**
+         * 启动session
+         */
+        session_start();
     }
 }

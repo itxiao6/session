@@ -18,5 +18,9 @@ class Redis implements Storage
     {
         ini_set("session.save_handler", "redis");
         ini_set("session.save_path", "tcp://{$host}:{$port}".$pwd!=null?"?auth={$pwd}":'');
+        /**
+         * 启动session
+         */
+        session_start();
     }
 }
