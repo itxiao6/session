@@ -84,6 +84,9 @@ class Session
      */
     public static function session_start()
     {
+        /**
+         * 判断session 是否已经启动
+         */
         if(self::$session_status){
             return false;
         }
