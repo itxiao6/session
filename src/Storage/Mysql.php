@@ -8,7 +8,7 @@ use PDO;
  * Class Mysql
  * @package Itxiao6\Session\Storage
  */
-class Mysql implements Storage
+class Mysql implements Storage,\SessionHandlerInterface
 {
     /**
      * pdo 链接
@@ -80,6 +80,7 @@ class Mysql implements Storage
              */
             $this -> connect -> query(sprintf($this -> creatTable,$this -> table));
         }
+        session_save_path(ROOT_PATH.'runtime/session/');
         session_set_save_handler(
             [&$this,'open'],
             [&$this,'close'],
@@ -120,23 +121,60 @@ class Mysql implements Storage
      */
     public function read($sessionId) {
         try {
+            /**
+             * 获取当前时间
+             */
             $time = time();
+            /**
+             * 定义sql语句
+             */
             $sql = "SELECT count(*) AS 'count' FROM ".$this -> table
                 ." WHERE skey = ? and expire > ?";
+            /**
+             * 预编译sql
+             */
             $stmt = $this -> connect -> prepare($sql);
+            /**
+             * 执行sql
+             */
             $stmt->execute([$sessionId, $time]);
+            /**
+             * 解析结果集
+             */
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            /**
+             * 判断数据是否存在
+             */
             if ($data['count'] = 0) {
-                return null;
+                return '';
             }
-            $sql = "SELECT 'data' FROM ".$this ->table
-                . " WHERE 'skey' = ? and 'expire' > ?";
+            /**
+             * 定义sql 语句
+             */
+            $sql = "SELECT data FROM {$this ->table} WHERE skey = ? and expire > ?";
+            /**
+             * 预编译sql
+             */
             $stmt = $this -> connect -> prepare($sql);
+            /**
+             * 执行sql
+             */
             $stmt->execute([$sessionId, $time]);
+            /**
+             * 解析结果集
+             */
             $data = $stmt -> fetch(PDO::FETCH_ASSOC);
-            return $data['data'];
+            /**
+             * 判断是否要返回数据
+             */
+            if($data == false){
+                return '';
+            }else{
+                return $data['data'];
+            }
         } catch (Exception $e) {
-            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
+            return '';
+//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
 
@@ -149,15 +187,26 @@ class Mysql implements Storage
      */
     public function write($sessionId, $data) {
         try {
+            /**
+             * 获取过期时间
+             */
             $expire = time() + get_cfg_var('session.gc_maxlifetime');
-
-            $sql = "INSERT INTO '{$this -> table}' ('skey', 'data', 'expire') "
-                . "values (?, ?, ?) "
+            /**
+             * 定义Sql 语句
+             */
+            $sql = "INSERT INTO {$this -> table} (skey,data,expire) values (?, ?, ?) "
                 . "ON DUPLICATE KEY UPDATE data = ?, expire = ?";
+            /**
+             * 预编译sql
+             */
             $stmt = $this -> connect ->prepare($sql);
-            return (Bool) $stmt->execute([$sessionId, $data, $expire, $data, $expire]);
+            /**
+             * 执行sql
+             */
+            return (Bool) $stmt -> execute([$sessionId, $data, $expire, $data, $expire]);
         } catch (Exception $e) {
-            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
+            return false;
+//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
 
@@ -169,12 +218,25 @@ class Mysql implements Storage
      */
     public function destroy($sessionId) {
         try {
-            $sql = "DELETE FROM '{$this -> table}' where skey = ?";
+            /**
+             * 定义sql 语句
+             */
+            $sql = "DELETE FROM {$this -> table} where skey = ?";
+            /**
+             * 预编译sql 语句
+             */
             $stmt = $this -> connect -> prepare($sql);
+            /**
+             * 执行sql 语句
+             */
             $stmt->execute(array($sessionId));
+            /**
+             * 返回结果
+             */
             return true;
         } catch (Exception $e) {
-            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
+            return false;
+//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
 
@@ -186,13 +248,25 @@ class Mysql implements Storage
      */
     public function gc($lifetime) {
         try {
-            $sql = "DELETE FROM '{$this -> table}' WHERE expire < ?";
+            /**
+             * 定义sql 语句
+             */
+            $sql = "DELETE FROM {$this -> table} WHERE expire < ?";
+            /**
+             * 执行sql 语句
+             */
             $stmt = $this -> connect -> prepare($sql);
+            /**
+             * 执行sql语句
+             */
             $stmt->execute([time()]);
-            $dbh = null;
+            /**
+             * 返回结果
+             */
             return true;
         } catch (Exception $e) {
-            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
+            return false;
+//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
 
@@ -205,10 +279,25 @@ class Mysql implements Storage
         if (filter_input(INPUT_GET, session_name()) == '' and
             filter_input(INPUT_COOKIE, session_name()) == '') {
             try {
+                /**
+                 * 定义sql 并执行 语句
+                 */
                 $stmt = $this -> connect -> query('SELECT uuid() AS uuid');
+                /**
+                 * 解析结果集
+                 */
                 $data = $stmt -> fetch(PDO::FETCH_ASSOC);
+                /**
+                 * 替换session_id 的-
+                 */
                 $data = str_replace('-', '', $data['uuid']);
+                /**
+                 * 修改session id
+                 */
                 session_id($data);
+                /**
+                 * 返回结果
+                 */
                 return true;
             } catch (Exception $e) {
                 throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
