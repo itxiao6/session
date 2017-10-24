@@ -15,7 +15,7 @@ class Session
      */
     protected static $interfaces = [
         'Local'=>Local::class,
-        'Redis'=>Local::class,
+        'Redis'=>Redis::class,
         'Mysql'=>Mysql::class
     ];
     /**
@@ -80,6 +80,7 @@ class Session
 
     /**
      * 启动session 回话
+     * @return bool
      */
     public static function session_start()
     {
