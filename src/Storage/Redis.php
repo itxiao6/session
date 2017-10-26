@@ -17,7 +17,7 @@ class Redis implements Storage
     public function __construct($host='127.0.0.1',$port = 6379,$pwd = null)
     {
         ini_set("session.save_handler", "redis");
-        ini_set("session.save_path", "tcp://{$host}:{$port}".$pwd!=null?"?auth={$pwd}":'');
+        ini_set("session.save_path", "tcp://{$host}:{$port}".($pwd!==null)?"?auth={$pwd}":'');
         /**
          * 启动session
          */
