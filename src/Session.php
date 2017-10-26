@@ -1,7 +1,5 @@
 <?php
 namespace Itxiao6\Session;
-use Itxiao6\Session\Storage\Local;
-use Itxiao6\Session\Storage\Mysql;
 
 /**
  * Class Session
@@ -14,9 +12,9 @@ class Session
      * @var array
      */
     protected static $interfaces = [
-        'Local'=>Local::class,
-        'Redis'=>Redis::class,
-        'Mysql'=>Mysql::class
+        'Local'=>\Itxiao6\Session\Storage\Local::class,
+        'Redis'=>\Itxiao6\Session\Storage\Redis::class,
+        'Mysql'=>\Itxiao6\Session\Storage\Mysql::class
     ];
     /**
      * 使用驱动
