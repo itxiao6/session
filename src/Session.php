@@ -98,4 +98,15 @@ class Session
          */
         self::$session_status = true;
     }
+    /**
+     * 装饰者模式
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        return \Itxiao6\Session\Tool\Session::$name(...$arguments);
+        // TODO: Implement __callStatic() method.
+    }
 }
