@@ -45,10 +45,11 @@ class Session
             $this -> session_id = self::getARandLetter(20);
             # 写入Cookie
             Cookie::set_cookie(\Itxiao6\Session\Session::get_session_name(),$this -> session_id,time()+3600,'/');
+        }else{
+            $this -> session_id = Cookie::get_cookie(\Itxiao6\Session\Session::get_session_name());
         }
         # 获取session 内容 并创建数据对象
         $this -> session_data = Data::create($this -> session_storage -> get($this -> session_id));
-
     }
 
     /**
