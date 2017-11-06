@@ -10,6 +10,11 @@ use Itxiao6\Session\Interfaces\Storage;
 class Local implements Storage
 {
     /**
+     * 定义session 存储路径
+     * @var string
+     */
+    protected $path = '/tmp/';
+    /**
      * 获取session 数据
      * @param $session_id
      */
@@ -26,5 +31,14 @@ class Local implements Storage
     public function set($session_id,$data)
     {
 
+    }
+
+    /**
+     * 实例化存储器
+     * @param $path
+     */
+    public function __construct($path = null)
+    {
+        $this -> path = ($path===null)?$this -> path:$path;
     }
 }
