@@ -56,9 +56,10 @@ class Session
      * @return bool|string
      */
     protected static function getARandLetter($number = 1) {
-        if ($number == 0)
-            return FALSE; //去除0
-        $number = $number < 0 ? - $number : $number; //如果小于零取正值
+        # 判断长度是否为0
+        if ($number == 0){return false;}
+        # 如果小于零取正值
+        $number = $number < 0 ? - $number : $number;
         $letterArr = array ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' );
         $returnStr ='';
         for($i= 0; $i < $number; $i ++) {
