@@ -33,17 +33,17 @@ class Data
     /**
      * 设置值
      */
-    public function set()
+    public function set($name = null,$value = null)
     {
-//        TODO 设置session 数据
+        return ($name === null)?$this -> data = $name:$this -> data[$name] = $value;
     }
 
     /**
      * 获取数据
      */
-    public function get()
+    public function get($name = null)
     {
-//        TODO 获取session 数据
+        return ($name===null)?$this -> data:$this -> data[$name];
     }
     /**
      * 返回所有数据
