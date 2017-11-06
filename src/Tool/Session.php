@@ -49,12 +49,29 @@ class Session
     }
 
     /**
+     * 设置值
+     * @return mixed
+     */
+    public function set()
+    {
+        return $this -> session_data -> set(...func_get_args());
+    }
+
+    /**
+     * 获取值
+     */
+    public function get()
+    {
+        return $this -> session_data -> get(...func_get_args());
+    }
+
+    /**
      * 保存session 数据
      * @return mixed
      */
     public function save()
     {
-        return $this -> session_storage -> set($this -> session_id,$this -> session_data -> get());
+        return $this -> session_storage -> set($this -> session_id,$this -> session_data -> all());
     }
 
 }

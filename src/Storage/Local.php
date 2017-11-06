@@ -15,22 +15,22 @@ class Local implements Storage
      */
     protected $path = '/tmp/';
     /**
-     * 获取session 数据
+     * 读取session 数据
      * @param $session_id
      */
     public function get($session_id)
     {
-
+        return unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).$session_id));
     }
 
     /**
-     * 设置session数据
+     * 写入session
      * @param $session_id
      * @param $data
      */
     public function set($session_id,$data)
     {
-
+        return file_put_contents(preg_replace('!\/$!','',$this -> path).$session_id,serialize($data));
     }
 
     /**

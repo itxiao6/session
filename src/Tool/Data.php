@@ -31,9 +31,24 @@ class Data
     }
 
     /**
-     * 返回序列化过的数据
+     * 设置值
+     */
+    public function set()
+    {
+//        TODO 设置session 数据
+    }
+
+    /**
+     * 获取数据
      */
     public function get()
+    {
+//        TODO 获取session 数据
+    }
+    /**
+     * 返回所有数据
+     */
+    public function all()
     {
         return $this -> data;
     }
