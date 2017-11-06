@@ -10,18 +10,21 @@ use Itxiao6\Session\Interfaces\Storage;
 class Local implements Storage
 {
     /**
-     * 本地存储器
-     * @param string $session_dir
+     * 获取session 数据
+     * @param $session_id
      */
-    public function __construct($session_dir = '/tmp')
+    public function get($session_id)
     {
-        /**
-         * 修改session文件的储存位置
-         */
-        session_save_path($session_dir);
-        /**
-         * 启动session
-         */
-        session_start();
+
+    }
+
+    /**
+     * 设置session数据
+     * @param $session_id
+     * @param $data
+     */
+    public function set($session_id,$data)
+    {
+
     }
 }

@@ -11,6 +11,24 @@ use PDO;
 class Mysql implements Storage,\SessionHandlerInterface
 {
     /**
+     * 获取session 数据
+     * @param $session_id
+     */
+    public function get($session_id)
+    {
+
+    }
+
+    /**
+     * 设置session数据
+     * @param $session_id
+     * @param $data
+     */
+    public function set($session_id,$data)
+    {
+
+    }
+    /**
      * pdo 链接
      * @var bool | object
      */

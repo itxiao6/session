@@ -33,7 +33,7 @@ class Data
     /**
      * 返回序列化过的数据
      */
-    public function get_data()
+    public function get()
     {
         return $this -> data;
     }

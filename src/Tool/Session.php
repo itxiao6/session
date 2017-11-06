@@ -54,7 +54,7 @@ class Session
      */
     public function save()
     {
-        return $this -> session_storage -> set($this -> session_id,$this -> session_data -> get_data());
+        return $this -> session_storage -> set($this -> session_id,$this -> session_data -> get());
     }
 
 }

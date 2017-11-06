@@ -9,6 +9,24 @@ use Itxiao6\Session\Interfaces\Storage;
 class Redis implements Storage
 {
     /**
+     * 获取session 数据
+     * @param $session_id
+     */
+    public function get($session_id)
+    {
+
+    }
+
+    /**
+     * 设置session数据
+     * @param $session_id
+     * @param $data
+     */
+    public function set($session_id,$data)
+    {
+
+    }
+    /**
      * Redis 存储器
      * @param string $host
      * @param int $port
