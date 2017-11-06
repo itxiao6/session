@@ -39,7 +39,8 @@ class Session
         # 保存session 存储实例
         $this -> session_storage = $storage;
         # 获取当前session_id
-        if(Cookie::get_cookie(\Itxiao6\Session\Session::get_session_name())){
+        if(Cookie::get_cookie(\Itxiao6\Session\Session::get_session_name()) == null ||
+            Cookie::get_cookie(\Itxiao6\Session\Session::get_session_name()) == ''){
             # 重新生成session_id
             $this -> session_id = self::getARandLetter(20);
             # 写入Cookie
