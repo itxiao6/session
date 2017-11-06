@@ -20,7 +20,7 @@ class Local implements Storage
      */
     public function get($session_id)
     {
-        return unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).$session_id));
+        return unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id));
     }
 
     /**
@@ -30,7 +30,7 @@ class Local implements Storage
      */
     public function set($session_id,$data)
     {
-        return file_put_contents(preg_replace('!\/$!','',$this -> path).$session_id,serialize($data));
+        return file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize($data));
     }
 
     /**
