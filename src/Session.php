@@ -21,12 +21,39 @@ class Session
      * @var bool | string
      */
     protected static $driver = 'Local';
+    /**
+     * 存储驱动实例
+     * @var null | object
+     */
+    protected static $storage = null;
+    /**
+     * Session实例
+     * @var null | object
+     */
+    protected static $example = null;
+    /**
+     * Session 名称
+     * @var string
+     */
+    protected static $name = 'Minkernel';
 
     /**
-     * 定义session 是否已经启动
-     * @var bool
+     * 设置session 名称
+     * @param $name
      */
-    protected static $session_status = false;
+    public static function set_session_name($name)
+    {
+        self::$name = $name;
+    }
+
+    /**
+     * 获取session 名称
+     * @return string
+     */
+    public static function get_session_name()
+    {
+        return self::$name;
+    }
 
     /**
      * 设置使用的驱动
@@ -77,26 +104,42 @@ class Session
     }
 
     /**
+     * 设置存储实例
+     * @param $object
+     */
+    public static function set_storage($object)
+    {
+        self::$storage = $object;
+    }
+
+    /**
+     * 获取存储实例
+     * @return null|object
+     */
+    public static function get_storage()
+    {
+        return self::$storage;
+    }
+
+    /**
+     * 获取session 操作实例
+     * @return null|object
+     */
+    public static function get_example()
+    {
+        return self::$example;
+    }
+
+    /**
      * 启动session 回话
      * @return bool
      */
     public static function session_start()
     {
         /**
-         * 判断session 是否已经启动
-         */
-        if(self::$session_status){
-            return false;
-        }
-        /**
          * 实例化存储器
          */
-        new self::$interfaces[self::$driver](...func_get_args());
-
-        /**
-         * 定义session 已经启动
-         */
-        self::$session_status = true;
+        self::$storage = new self::$interfaces[self::$driver](...func_get_args());
     }
     /**
      * 装饰者模式
@@ -106,7 +149,15 @@ class Session
      */
     public static function __callStatic($name, $arguments)
     {
-        return \Itxiao6\Session\Tool\Session::$name(...$arguments);
-        // TODO: Implement __callStatic() method.
+        # 判断是否已经启动了Session
+        if(self::$storage === null){
+            return false;
+        }
+        # 判断是否已经实例是否启动
+        if(self::$example === null){
+            self::$example = new Itxiao6\Session\Tool\Session(self::$storage);
+        }
+        # 返回工具类返回的结果
+        return self::$example -> $name(...$arguments);
     }
 }
