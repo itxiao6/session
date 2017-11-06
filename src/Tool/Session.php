@@ -41,11 +41,30 @@ class Session
         # 获取当前session_id
         if(Cookie::get_cookie(\Itxiao6\Session\Session::get_session_name())){
             # 重新生成session_id
-//            TODO 生成session_id 规则
+            $this -> session_id = self::getARandLetter(20);
+            # 写入Cookie
+            Cookie::set_cookie(\Itxiao6\Session\Session::get_session_name(),$this -> session_id,time()+3600,'/');
         }
         # 获取session 内容 并创建数据对象
         $this -> session_data = Data::create($this -> session_storage -> get($this -> session_id));
 
+    }
+
+    /**
+     * 获取随机字符串
+     * @param int $number
+     * @return bool|string
+     */
+    protected static function getARandLetter($number = 1) {
+        if ($number == 0)
+            return FALSE; //去除0
+        $number = $number < 0 ? - $number : $number; //如果小于零取正值
+        $letterArr = array ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' );
+        $returnStr ='';
+        for($i= 0; $i < $number; $i ++) {
+            $returnStr .= $letterArr [rand ( 0, 51 )];
+        }
+        return $returnStr;
     }
 
     /**
