@@ -43,7 +43,7 @@ class Data
      */
     public function get($name = null)
     {
-        return ($name===null)?$this -> data:$this -> data[$name];
+        return ($name===null)?$this -> data[0]:$this -> data[0][$name];
     }
     /**
      * 返回所有数据
