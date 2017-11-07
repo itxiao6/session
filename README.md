@@ -31,8 +31,11 @@ Session::session_start($redis);
 ```
 ####更多存储机制可以无限扩展和替换
 ######备注
+```text
     1.存储器必须继承:Itxiao6\Session\Interfaces\Storage 接口
     2.Session::session_start();的参数会传递到存储器的构造方法内,所有开发存储器只需要在构造方法活动连接 即可 
+```
+
 ```php
 # 设置新的存储器
 Session::set_interface('Memcache',/MyNameSpace/MyMemcache::class);
