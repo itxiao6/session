@@ -8,26 +8,9 @@ use PDO;
  * Class Mysql
  * @package Itxiao6\Session\Storage
  */
-class Mysql implements Storage,\SessionHandlerInterface
+class Mysql implements Storage
 {
-    /**
-     * 获取session 数据
-     * @param $session_id
-     */
-    public function get($session_id)
-    {
 
-    }
-
-    /**
-     * 设置session数据
-     * @param $session_id
-     * @param $data
-     */
-    public function set($session_id,$data)
-    {
-
-    }
     /**
      * pdo 链接
      * @var bool | object
@@ -62,12 +45,12 @@ class Mysql implements Storage,\SessionHandlerInterface
      * @param string $password
      * @param string $table_name
      */
-    public function __construct($pdo=null,$dns = '',$user = '',$password = '',$table_name = '')
+    public function __construct($pdo=null,$dns = '',$user = '',$password = '',$table_name = null)
     {
         /**
          * 判断是否自定义了表
          */
-        if($table_name!=''){
+        if($table_name!=null){
             $this -> table = $table_name;
         }
         if($pdo != null){
@@ -98,18 +81,6 @@ class Mysql implements Storage,\SessionHandlerInterface
              */
             $this -> connect -> query(sprintf($this -> creatTable,$this -> table));
         }
-        session_save_path(ROOT_PATH.'runtime/session/');
-        session_set_save_handler(
-            [&$this,'open'],
-            [&$this,'close'],
-            [&$this,'read'],
-            [&$this,'write'],
-            [&$this,'destroy'],
-            [&$this,'gc']);
-        /**
-         * 启动session
-         */
-        session_start();
     }
 
     /**
@@ -130,14 +101,13 @@ class Mysql implements Storage,\SessionHandlerInterface
             throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
-
     /**
-     * 读取session
-     * @param $sessionId
-     * @return string
-     * @throws Exception
+     * 获取session 数据
+     * @param $session_id
+     * @return null|string
      */
-    public function read($sessionId) {
+    public function get($session_id)
+    {
         try {
             /**
              * 获取当前时间
@@ -155,7 +125,7 @@ class Mysql implements Storage,\SessionHandlerInterface
             /**
              * 执行sql
              */
-            $stmt->execute([$sessionId, $time]);
+            $stmt->execute([$session_id, $time]);
             /**
              * 解析结果集
              */
@@ -164,7 +134,7 @@ class Mysql implements Storage,\SessionHandlerInterface
              * 判断数据是否存在
              */
             if ($data['count'] = 0) {
-                return '';
+                return null;
             }
             /**
              * 定义sql 语句
@@ -177,7 +147,7 @@ class Mysql implements Storage,\SessionHandlerInterface
             /**
              * 执行sql
              */
-            $stmt->execute([$sessionId, $time]);
+            $stmt->execute([$session_id, $time]);
             /**
              * 解析结果集
              */
@@ -191,19 +161,18 @@ class Mysql implements Storage,\SessionHandlerInterface
                 return $data['data'];
             }
         } catch (Exception $e) {
-            return '';
-//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
+            return null;
         }
     }
 
     /**
-     * 写入session
-     * @param $sessionId
+     * 设置session数据
+     * @param $session_id
      * @param $data
      * @return bool
-     * @throws Exception
      */
-    public function write($sessionId, $data) {
+    public function set($session_id,$data)
+    {
         try {
             /**
              * 获取过期时间
@@ -221,20 +190,19 @@ class Mysql implements Storage,\SessionHandlerInterface
             /**
              * 执行sql
              */
-            return (Bool) $stmt -> execute([$sessionId, $data, $expire, $data, $expire]);
+            return (Bool) $stmt -> execute([$session_id, $data, $expire, $data, $expire]);
         } catch (Exception $e) {
             return false;
-//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
 
     /**
      * 销毁session
-     * @param $sessionId
+     * @param $session_id
      * @return bool
-     * @throws Exception
      */
-    public function destroy($sessionId) {
+    public function destroy($session_id)
+    {
         try {
             /**
              * 定义sql 语句
@@ -247,24 +215,23 @@ class Mysql implements Storage,\SessionHandlerInterface
             /**
              * 执行sql 语句
              */
-            $stmt->execute(array($sessionId));
+            $stmt->execute([$session_id]);
             /**
              * 返回结果
              */
             return true;
         } catch (Exception $e) {
             return false;
-//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
 
     /**
-     * gc 函数
-     * @param $lifetime
+     * 垃圾回收
      * @return bool
      * @throws Exception
      */
-    public function gc($lifetime) {
+    public function gc()
+    {
         try {
             /**
              * 定义sql 语句
@@ -284,62 +251,6 @@ class Mysql implements Storage,\SessionHandlerInterface
             return true;
         } catch (Exception $e) {
             return false;
-//            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
         }
     }
-
-    /**
-     * id 函数
-     * @return bool
-     * @throws Exception
-     */
-    function id() {
-        if (filter_input(INPUT_GET, session_name()) == '' and
-            filter_input(INPUT_COOKIE, session_name()) == '') {
-            try {
-                /**
-                 * 定义sql 并执行 语句
-                 */
-                $stmt = $this -> connect -> query('SELECT uuid() AS uuid');
-                /**
-                 * 解析结果集
-                 */
-                $data = $stmt -> fetch(PDO::FETCH_ASSOC);
-                /**
-                 * 替换session_id 的-
-                 */
-                $data = str_replace('-', '', $data['uuid']);
-                /**
-                 * 修改session id
-                 */
-                session_id($data);
-                /**
-                 * 返回结果
-                 */
-                return true;
-            } catch (Exception $e) {
-                throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
-            }
-
-        }
-    }
-
-    /**
-     * 打开session
-     * @param $savePath
-     * @param $sessionName
-     * @return bool
-     */
-    public function open($savePath, $sessionName) {
-        return true;
-    }
-
-    /**
-     * 关闭session
-     * @return bool
-     */
-    public function close() {
-        return true;
-    }
-
 }

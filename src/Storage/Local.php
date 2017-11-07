@@ -14,9 +14,11 @@ class Local implements Storage
      * @var string
      */
     protected $path = '/tmp/';
+
     /**
      * 读取session 数据
      * @param $session_id
+     * @return mixed
      */
     public function get($session_id)
     {
@@ -27,10 +29,28 @@ class Local implements Storage
      * 写入session
      * @param $session_id
      * @param $data
+     * @return bool|int
      */
     public function set($session_id,$data)
     {
         return file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize($data));
+    }
+    /**
+     * 垃圾回收
+     * @return bool
+     * @throws Exception
+     */
+    public function gc(){
+//        TODO 文件垃圾回收机制
+    }
+    /**
+     * 销毁session
+     * @param $session_id
+     * @return bool
+     */
+    public function destroy($session_id)
+    {
+        return unlink(preg_replace('!\/$!','',$this -> path).'/'.$session_id);
     }
 
     /**

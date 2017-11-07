@@ -21,4 +21,17 @@ interface Storage
      * @return mixed
      */
     public function set($session_id,$data);
+
+    /**
+     * 销毁session
+     * @param $session_id
+     * @return mixed
+     */
+    public function destroy($session_id);
+
+    /**
+     * 垃圾回收机制
+     * @return mixed
+     */
+    public function gc();
 }

@@ -9,36 +9,49 @@ use Itxiao6\Session\Interfaces\Storage;
 class Redis implements Storage
 {
     /**
-     * 获取session 数据
+     * 读取session 数据
      * @param $session_id
+     * @return mixed
      */
     public function get($session_id)
     {
-
+//        TODO 获取session内容
     }
 
     /**
-     * 设置session数据
+     * 写入session
      * @param $session_id
      * @param $data
+     * @return bool|int
      */
     public function set($session_id,$data)
     {
-
+//        TODO 写入session
     }
     /**
-     * Redis 存储器
-     * @param string $host
-     * @param int $port
-     * @param null $pwd
+     * 垃圾回收
+     * @return bool
+     * @throws Exception
+     */
+    public function gc(){
+//        TODO 文件垃圾回收机制
+    }
+    /**
+     * 销毁session
+     * @param $session_id
+     * @return bool
+     */
+    public function destroy($session_id)
+    {
+//        TODO 销毁session
+    }
+
+    /**
+     * 实例化存储器
+     * @param $path
      */
     public function __construct($host='127.0.0.1',$port = 6379,$pwd = null)
     {
-        ini_set("session.save_handler", "redis");
-        ini_set("session.save_path", "tcp://{$host}:{$port}".(($pwd!==null)?"?auth={$pwd}":''));
-        /**
-         * 启动session
-         */
-        session_start();
+//        TODO 获取Redis 连接池 或进行创建新的 Redis 链接
     }
 }
