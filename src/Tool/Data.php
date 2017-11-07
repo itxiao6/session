@@ -35,7 +35,7 @@ class Data
      */
     public function set($name = null,$value = null)
     {
-        return ($name === null)?$this -> data = $name:$this -> data[$name] = $value;
+        return ($value === null)?$this -> data = $name:$this -> data[$name] = $value;
     }
 
     /**
@@ -43,7 +43,7 @@ class Data
      */
     public function get($name = null)
     {
-        return ($name===null)?$this -> data[0]:$this -> data[0][$name];
+        return ($name===null)?$this -> data:$this -> data[$name];
     }
     /**
      * 返回所有数据
