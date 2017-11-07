@@ -33,7 +33,7 @@ Session::session_start($redis);
 ######备注
 ```text
     1.存储器必须继承:Itxiao6\Session\Interfaces\Storage 接口
-    2.Session::session_start();的参数会传递到存储器的构造方法内,所有开发存储器只需要在构造方法活动连接 即可 
+    2.Session::session_start();的参数会传递到存储器的构造方法内,所有开发存储器只需要在构造方法获取连接 即可 
 ```
 
 ```php
