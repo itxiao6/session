@@ -155,7 +155,7 @@ class Session
         }
         # 判断是否已经实例是否启动
         if(self::$example === null){
-            self::$example = new \Itxiao6\Session\Tool\Session(self::$storage);
+            self::$example = new \Itxiao6\Session\Tools\Session(self::$storage);
         }
         # 返回工具类返回的结果
         return self::$example -> $name(...$arguments);

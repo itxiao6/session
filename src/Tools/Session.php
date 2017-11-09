@@ -1,10 +1,10 @@
 <?php
-namespace Itxiao6\Session\Tool;
+namespace Itxiao6\Session\Tools;
 use Itxiao6\Session\Interfaces\Storage;
 /**
  * Session 操作类
  * Class Session
- * @package Itxiao6\Session\Tool
+ * @package Itxiao6\Session\Tools
  */
 class Session
 {

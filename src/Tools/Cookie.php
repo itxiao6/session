@@ -1,11 +1,11 @@
 <?php
-namespace Itxiao6\Session\Tool;
+namespace Itxiao6\Session\Tools;
 use Itxiao6\Route\Bridge\Http;
 
 /**
  * Cookie 操作类
  * Class Cookie
- * @package Itxiao6\Session\Tool
+ * @package Itxiao6\Session\Tools
  */
 class Cookie
 {

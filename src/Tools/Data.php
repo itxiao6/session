@@ -1,9 +1,9 @@
 <?php
-namespace Itxiao6\Session\Tool;
+namespace Itxiao6\Session\Tools;
 /**
  * session 数据类
  * Class Data
- * @package Itxiao6\Session\Tool
+ * @package Itxiao6\Session\Tools
  */
 class Data
 {
