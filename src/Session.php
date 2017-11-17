@@ -36,23 +36,47 @@ class Session
      * @var string
      */
     protected static $name = 'Minkernel';
+    /**
+     * 请求实例 (swoole 模式下才用的到)
+     * @var null | object
+     */
+    protected static $request = null;
+    /**
+     * 响应实例 (swoole 模式下才用的到)
+     * @var null | object
+     */
+    protected static $response = null;
 
     /**
-     * 设置session 名称
+     * 装饰者模式
      * @param $name
+     * @param $arguments
+     * @return mixed
      */
-    public static function set_session_name($name)
+    public static function __callStatic($name, $arguments)
     {
-        self::$name = $name;
+        # 判断是否已经启动了Session
+        if(self::$storage === null){
+            return false;
+        }
+        # 判断是否已经实例是否启动
+        if(self::$example === null){
+            self::$example = new \Itxiao6\Session\Tools\Session(self::$storage);
+        }
+        # 返回工具类返回的结果
+        return self::$example -> $name(...$arguments);
     }
 
     /**
-     * 获取session 名称
-     * @return string
+     * 启动session 回话
+     * @return bool
      */
-    public static function get_session_name()
+    public static function session_start()
     {
-        return self::$name;
+        /**
+         * 实例化存储器
+         */
+        self::$storage = new self::$interfaces[self::$driver](...func_get_args());
     }
 
     /**
@@ -131,33 +155,58 @@ class Session
     }
 
     /**
-     * 启动session 回话
-     * @return bool
-     */
-    public static function session_start()
-    {
-        /**
-         * 实例化存储器
-         */
-        self::$storage = new self::$interfaces[self::$driver](...func_get_args());
-    }
-    /**
-     * 装饰者模式
+     * 设置session 名称
      * @param $name
-     * @param $arguments
+     */
+    public static function set_session_name($name)
+    {
+        self::$name = $name;
+    }
+
+    /**
+     * 获取session 名称
+     * @return string
+     */
+    public static function get_session_name()
+    {
+        return self::$name;
+    }
+
+    /**
+     * 设置请求 (swoole 模式下才用的到)
+     * @param $request
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function set_request($request)
     {
-        # 判断是否已经启动了Session
-        if(self::$storage === null){
-            return false;
-        }
-        # 判断是否已经实例是否启动
-        if(self::$example === null){
-            self::$example = new \Itxiao6\Session\Tools\Session(self::$storage);
-        }
-        # 返回工具类返回的结果
-        return self::$example -> $name(...$arguments);
+        return self::$request = $request;
+    }
+
+    /**
+     * 获取请求 (swoole 模式下才用的到)
+     * @return null|object
+     */
+    public static function get_request()
+    {
+        return self::$request;
+    }
+
+    /**
+     * 设置响应 (swoole 模式下才用的到)
+     * @param $response
+     * @return mixed
+     */
+    public static function set_response($response)
+    {
+        return self::$response = $response;
+    }
+
+    /**
+     * 获取响应 (swoole 模式下才用的到)
+     * @return null|object
+     */
+    public static function get_response()
+    {
+        return self::$request;
     }
 }
