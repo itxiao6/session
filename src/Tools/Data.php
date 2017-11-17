@@ -15,10 +15,11 @@ class Data
 
     /**
      * 创建一个数据类
+     * @return Data
      */
     public static function create()
     {
-        return new self(func_get_args());
+        return new self(...func_get_args());
     }
 
     /**
@@ -32,6 +33,9 @@ class Data
 
     /**
      * 设置值
+     * @param null $name
+     * @param null $value
+     * @return null
      */
     public function set($name = null,$value = null)
     {
@@ -40,13 +44,17 @@ class Data
 
     /**
      * 获取数据
+     * @param null $name
+     * @return array|mixed|null|object
      */
     public function get($name = null)
     {
         return ($name===null)?$this -> data:$this -> data[$name];
     }
+
     /**
      * 返回所有数据
+     * @return array|null|object
      */
     public function all()
     {

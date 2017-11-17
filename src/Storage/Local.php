@@ -22,7 +22,9 @@ class Local implements Storage
      */
     public function get($session_id)
     {
-        return unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id));
+        $data = unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id));
+        unset($data[0]);
+        return $data;
     }
 
     /**

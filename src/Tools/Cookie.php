@@ -14,7 +14,11 @@ class Cookie
      */
     public static function set_cookie()
     {
-        return Http::get_response() -> cookie(...func_get_args());
+        if(PHP_SAPI === 'cli'){
+            return Http::get_response() -> cookie(...func_get_args());
+        }else{
+            return setcookie(...func_get_args());
+        }
     }
 
     /**
@@ -24,6 +28,10 @@ class Cookie
      */
     public static function get_cookie($name = null)
     {
-        return ($name===null)?Http::get_request() -> cookie:Http::get_request() -> cookie[$name];
+        if(PHP_SAPI === 'cli'){
+            return ($name===null)?Http::get_request() -> cookie:Http::get_request() -> cookie[$name];
+        }else{
+            return ($name===null)?$_COOKIE:(isset($_COOKIE[$name])?$_COOKIE[$name]:null);
+        }
     }
 }
