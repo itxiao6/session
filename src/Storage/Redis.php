@@ -20,7 +20,7 @@ class Redis implements Storage
      */
     public function get($session_id)
     {
-        return unserialize($this -> redis -> get($session_id));
+        return unserialize($this -> redis -> get("session_".$session_id));
     }
 
     /**
@@ -31,7 +31,7 @@ class Redis implements Storage
      */
     public function set($session_id,$data)
     {
-        return $this -> redis -> set($session_id,serialize($data),Session::get_expire());
+        return $this -> redis -> set("session_".$session_id,serialize($data),Session::get_expire());
     }
     /**
      * 垃圾回收
@@ -49,7 +49,7 @@ class Redis implements Storage
      */
     public function destroy($session_id)
     {
-        return $this -> redis -> delete($session_id);
+        return $this -> redis -> delete("session_".$session_id);
     }
 
     /**
