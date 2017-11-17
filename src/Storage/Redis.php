@@ -33,7 +33,8 @@ class Redis implements Storage
      * @return bool
      * @throws Exception
      */
-    public function gc(){
+    public function gc()
+    {
 //        TODO 文件垃圾回收机制
     }
     /**
@@ -45,13 +46,27 @@ class Redis implements Storage
     {
 //        TODO 销毁session
     }
+    protected function connection($host,$port,$pwd)
+    {
+        $redis = new \Redis();
+        $redis -> connect($host,$port);
+        return $redis;
+    }
 
     /**
      * 实例化存储器
-     * @param $path
+     * @param null $redis
+     * @param string $host
+     * @param int $port
+     * @param null $pwd
      */
-    public function __construct($host='127.0.0.1',$port = 6379,$pwd = null)
+    public function __construct($redis=null,$host='127.0.0.1',$port = 6379,$pwd = null)
     {
-//        TODO 获取Redis 连接池 或进行创建新的 Redis 链接
+        # 判断是否需要连接
+        if($redis != null){
+            $redis = $this -> connection($host,$port,$pwd);
+        }
+        # 设置连接
+        $this -> redis = $redis;
     }
 }

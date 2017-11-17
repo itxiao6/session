@@ -90,7 +90,7 @@ class Mysql implements Storage
      * @param $pwd
      * @throws Exception
      */
-    public function connection($dns,$user,$pwd) {
+    protected function connection($dns,$user,$pwd) {
         try {
             $this -> connect = new PDO($dns, $user, $pwd, array(
                 PDO::ATTR_PERSISTENT => true,
@@ -156,9 +156,9 @@ class Mysql implements Storage
              * 判断是否要返回数据
              */
             if($data == false){
-                return '';
+                return null;
             }else{
-                return $data['data'];
+                return unserialize($data['data']);
             }
         } catch (Exception $e) {
             return null;
@@ -190,8 +190,9 @@ class Mysql implements Storage
             /**
              * 执行sql
              */
-            return (Bool) $stmt -> execute([$session_id, $data, $expire, $data, $expire]);
+            return (Bool) $stmt -> execute([$session_id, serialize($data), $expire, serialize($data), $expire]);
         } catch (Exception $e) {
+            var_dump($e -> getMessage());
             return false;
         }
     }
