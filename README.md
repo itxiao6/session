@@ -15,11 +15,11 @@ Session::session_start(__DIR__.'/session');
 ### 2.MySql存储介质
 ```php
 // 设置存储介质
-//Session::set_driver('Mysql'); // 默认为 Local
+Session::set_driver('Mysql'); // 默认为 Local
 # 获取pdo 实例
-//$pdo = new \PDO('mysql:host=localhost;dbname=dbname', 'dbname', 'password');
+$pdo = new \PDO('mysql:host=localhost;dbname=dbname', 'dbname', 'password');
 // 启动会话
-//Session::session_start($pdo);
+Session::session_start($pdo);
 ```
 ### 3.Redis存储介质
 ```php
