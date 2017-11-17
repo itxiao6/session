@@ -1,33 +1,41 @@
 # session
 #####基于Cookie 重写了PHP自带的 SESSION 机制，存储介质支持:本地模式、Mysql、Redis php运行模式支持:LAMP、LNMP、SWOOLE
-# 启动会话
-###1.本地存储方式(默认)
+##1.引入入口
 ```php
 use \Itxiao6\Session\Session;
+```
+##2.启动会话
+###1.本地存储方式(默认)
+```php
 // 设置存储介质
-Session::set_driver('Local'); // 默认为Local
+Session::set_driver('Local'); // 默认为 Local
 // 启动会话
-Session::session_start(ROOT_PATH.'runtime/session');
+Session::session_start(__DIR__.'/session');
 ```
 ###2.MySql存储介质
 ```php
-# 获取PDO 实例
-$pdo = new \PDO($dns, $user, $pwd);
-use \Itxiao6\Session\Session;
 // 设置存储介质
-Session::set_driver('Mysql');
+//Session::set_driver('Mysql'); // 默认为 Local
+# 获取pdo 实例
+//$pdo = new \PDO('mysql:host=localhost;dbname=dbname', 'dbname', 'password');
 // 启动会话
-Session::session_start($pdo);
+//Session::session_start($pdo);
 ```
 ###3.Redis存储介质
 ```php
-$redis = Redis();
-$redis -> connect('127.0.0.1', 6379); 
-use \Itxiao6\Session\Session;
-// 设置存储介质
-Session::set_driver('Redis');
+Session::set_driver('Redis'); // 默认为 Local
+$redis = new \Redis();
+$redis -> connect('127.0.0.1',6379);
 // 启动会话
 Session::session_start($redis);
+```
+###4.使用Session
+```php
+# 设置值
+Session::set('name','戒尺');
+Session::save();
+# 获取值
+var_dump(Session::get());
 ```
 ####更多存储机制可以无限扩展和替换
 ######备注
