@@ -177,7 +177,7 @@ class Mysql implements Storage
             /**
              * 获取过期时间
              */
-            $expire = time() + get_cfg_var('session.gc_maxlifetime');
+            $expire = Session::get_expire();
             /**
              * 定义Sql 语句
              */

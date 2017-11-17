@@ -31,7 +31,7 @@ class Redis implements Storage
      */
     public function set($session_id,$data)
     {
-        return $this -> redis -> set($session_id,serialize($data),time() + get_cfg_var('session.gc_maxlifetime'));
+        return $this -> redis -> set($session_id,serialize($data),Session::get_expire());
     }
     /**
      * 垃圾回收

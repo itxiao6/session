@@ -1,6 +1,7 @@
 <?php
 namespace Itxiao6\Session\Storage;
 use Itxiao6\Session\Interfaces\Storage;
+use Itxiao6\Session\Tools\Session;
 
 /**
  * Local 存储
@@ -22,9 +23,14 @@ class Local implements Storage
      */
     public function get($session_id)
     {
+        # 获取session 数据
         $data = unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id));
-        unset($data[0]);
-        return $data;
+        # 判断是否过期
+        if($data['expire'] >= time()){
+            $this -> destroy($session_id);
+            return false;
+        }
+        return $data['data'];
     }
 
     /**
@@ -35,7 +41,7 @@ class Local implements Storage
      */
     public function set($session_id,$data)
     {
-        return file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize($data));
+        return ['data'=>file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize($data)),'expire'=>Session::get_expire()];
     }
     /**
      * 垃圾回收

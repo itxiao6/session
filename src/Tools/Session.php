@@ -8,6 +8,7 @@ use Itxiao6\Session\Interfaces\Storage;
  */
 class Session
 {
+
     /**
      * Session ID
      * @var string
@@ -96,4 +97,12 @@ class Session
         return $this -> session_storage -> set($this -> session_id,$this -> session_data -> all());
     }
 
+    /**
+     * 获取过期时间
+     * @return int|string
+     */
+    public static function get_expire()
+    {
+        return time() + get_cfg_var('session.gc_maxlifetime');
+    }
 }
