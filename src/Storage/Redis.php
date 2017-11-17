@@ -9,13 +9,18 @@ use Itxiao6\Session\Interfaces\Storage;
 class Redis implements Storage
 {
     /**
+     * Redis 驱动
+     * @var null|\Redis
+     */
+    protected $redis = null;
+    /**
      * 读取session 数据
      * @param $session_id
      * @return mixed
      */
     public function get($session_id)
     {
-//        TODO 获取session内容
+        return unserialize($this -> redis -> get($session_id));
     }
 
     /**
@@ -26,7 +31,7 @@ class Redis implements Storage
      */
     public function set($session_id,$data)
     {
-//        TODO 写入session
+        return $this -> redis -> set($session_id,serialize($data),time() + get_cfg_var('session.gc_maxlifetime'));
     }
     /**
      * 垃圾回收
@@ -35,7 +40,7 @@ class Redis implements Storage
      */
     public function gc()
     {
-//        TODO 文件垃圾回收机制
+        return true;
     }
     /**
      * 销毁session
@@ -44,13 +49,24 @@ class Redis implements Storage
      */
     public function destroy($session_id)
     {
-//        TODO 销毁session
+        return $this -> redis -> delete($session_id);
     }
+
+    /**
+     * 连接redis
+     * @param $host
+     * @param $port
+     * @param $pwd
+     * @return \Redis
+     */
     protected function connection($host,$port,$pwd)
     {
-        $redis = new \Redis();
-        $redis -> connect($host,$port);
-        return $redis;
+        if(!$this -> redis -> ping()){
+            $redis = new \Redis();
+            return $redis -> connect($host,$port);
+        }else{
+            return $this -> redis;
+        }
     }
 
     /**
@@ -63,7 +79,7 @@ class Redis implements Storage
     public function __construct($redis=null,$host='127.0.0.1',$port = 6379,$pwd = null)
     {
         # 判断是否需要连接
-        if($redis != null){
+        if($redis != null || (!$redis -> ping())){
             $redis = $this -> connection($host,$port,$pwd);
         }
         # 设置连接
