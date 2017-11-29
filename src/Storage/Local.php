@@ -46,6 +46,10 @@ class Local implements Storage
      */
     public function set($session_id,$data)
     {
+        # 判断session目录是否存在
+        if(!is_dir($this -> path)){
+            mkdir($this -> path,'0777',true);
+        }
         return file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize(['data'=>$data,'expire'=>Session::get_expire()]));
     }
     /**
