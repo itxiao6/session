@@ -29,7 +29,7 @@ class Cookie
     public static function get_cookie($name = null)
     {
         if(PHP_SAPI === 'cli'){
-            return ($name===null)?Session::get_request() -> cookie:Session::get_request() -> cookie[$name];
+            return ($name===null)?Session::get_request() -> cookie:(isset(Session::get_request() -> cookie[$name])?Session::get_request() -> cookie[$name]:null);
         }else{
             return ($name===null)?$_COOKIE:(isset($_COOKIE[$name])?$_COOKIE[$name]:null);
         }
