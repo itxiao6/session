@@ -23,8 +23,13 @@ class Local implements Storage
      */
     public function get($session_id)
     {
-        # 获取session 数据
-        $data = unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id));
+        # 判断session文件是否存在
+        if(file_exists(preg_replace('!\/$!','',$this -> path).'/'.$session_id)){
+            # 获取session 数据
+            $data = unserialize(file_get_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id));
+        }else{
+            return null;
+        }
         # 判断是否过期
         if($data['expire'] >= time()){
             $this -> destroy($session_id);
