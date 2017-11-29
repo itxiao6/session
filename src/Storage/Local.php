@@ -31,7 +31,7 @@ class Local implements Storage
             return null;
         }
         # 判断是否过期
-        if($data['expire'] >= time()){
+        if($data['expire'] <= time()){
             $this -> destroy($session_id);
             return false;
         }
@@ -46,7 +46,7 @@ class Local implements Storage
      */
     public function set($session_id,$data)
     {
-        return ['data'=>file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize($data)),'expire'=>Session::get_expire()];
+        return file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize(['data'=>$data,'expire'=>Session::get_expire()]));
     }
     /**
      * 垃圾回收
