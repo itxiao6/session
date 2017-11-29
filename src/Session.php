@@ -207,6 +207,6 @@ class Session
      */
     public static function get_response()
     {
-        return self::$request;
+        return self::$response;
     }
 }
