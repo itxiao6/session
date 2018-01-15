@@ -52,10 +52,10 @@ class Local implements Storage
         }
         return file_put_contents(preg_replace('!\/$!','',$this -> path).'/'.$session_id,serialize(['data'=>$data,'expire'=>Session::get_expire()]));
     }
+
     /**
      * 垃圾回收
-     * @return bool
-     * @throws Exception
+     * @return mixed|void
      */
     public function gc(){
 //        TODO 文件垃圾回收机制

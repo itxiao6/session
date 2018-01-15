@@ -39,11 +39,13 @@ class Mysql implements Storage
 
     /**
      * Mysql 存储器
+     * Mysql constructor.
      * @param null $pdo
      * @param string $dns
      * @param string $user
      * @param string $password
-     * @param string $table_name
+     * @param null $table_name
+     * @throws Exception
      */
     public function __construct($pdo=null,$dns = '',$user = '',$password = '',$table_name = null)
     {
