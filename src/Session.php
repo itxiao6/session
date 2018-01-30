@@ -11,202 +11,207 @@ class Session
      * 存储接口
      * @var array
      */
-    protected static $interfaces = [
+    protected $interfaces = [
         'Local'=>\Itxiao6\Session\Storage\Local::class,
         'Redis'=>\Itxiao6\Session\Storage\Redis::class,
         'Mysql'=>\Itxiao6\Session\Storage\Mysql::class
     ];
     /**
-     * 使用驱动
-     * @var bool | string
-     */
-    protected static $driver = 'Local';
-    /**
      * 存储驱动实例
      * @var null | object
      */
-    protected static $storage = null;
+    protected $storage = null;
+    /**
+     * 使用驱动
+     * @var bool | string
+     */
+    protected $driver = 'Local';
     /**
      * Session实例
      * @var null | object
      */
-    protected static $example = null;
+    protected $example = null;
     /**
      * Session 名称
      * @var string
      */
-    protected static $name = 'Minkernel';
+    protected $name = 'Minkernel';
     /**
      * 请求实例 (swoole 模式下才用的到)
      * @var null | object
      */
-    protected static $request = null;
+    protected $request = null;
     /**
      * 响应实例 (swoole 模式下才用的到)
      * @var null | object
      */
-    protected static $response = null;
+    protected $response = null;
 
     /**
-     * 装饰者模式
-     * @param $name
-     * @param $arguments
-     * @return mixed
+     * 构造方法
      */
-    public static function __callStatic($name, $arguments)
+    protected function __construct()
     {
-        # 判断是否已经启动了Session
-        if(self::$storage === null){
-            return false;
-        }
-        # 判断是否已经实例是否启动
-        if(self::$example === null){
-            self::$example = new \Itxiao6\Session\Tools\Session(self::$storage);
-        }
-        # 返回工具类返回的结果
-        return self::$example -> $name(...$arguments);
+
+    }
+
+    /**
+     * 获取接口
+     */
+    public static function getInterface()
+    {
+        return new static(...func_get_args());
     }
 
     /**
      * 启动session 回话
-     * @return bool
+     * @return $this
      */
-    public static function session_start()
+    public function session_start()
     {
         /**
          * 实例化存储器
          */
-        self::$storage = new self::$interfaces[self::$driver](...func_get_args());
+        $this -> storage = new $this -> interfaces[$this -> driver](...func_get_args());
+        return $this;
     }
 
     /**
      * 设置使用的驱动
      * @param $type
      */
-    public static function set_driver($type)
+    public function set_driver($type)
     {
-        self::$driver = $type;
+        $this -> driver = $type;
     }
 
     /**
      * 获取驱动
      * @return bool|string
      */
-    public static function get_driver()
+    public function get_driver()
     {
-        return self::$driver;
+        return $this -> driver;
     }
 
     /**
      * 获取存储接口
-     * @param null | string $key
+     * @param null $key
      * @return array|mixed
      */
-    public static function get_interface($key = null)
+    public function get_interface($key = null)
     {
         if(self::$key!=null){
-            return self::$interfaces[$key];
+            return $this -> interfaces[$key];
         }else{
-            return self::$interfaces;
+            return $this -> interfaces;
         }
     }
 
     /**
      * 设置存储接口
-     * @param null | array | string $key
-     * @param null | value $value
+     * @param null|array $key
+     * @param null|string $value
+     * @return $this
      */
-    public static function set_interface($key = null,$value = null)
+    public function set_interface($key = null,$value = null)
     {
         if(is_array($key) && $value==null){
             foreach ($key as $key=>$val){
-                self::$interfaces[$key] = $val;
+                $this -> interfaces[$key] = $val;
             }
         }else{
-            self::$interfaces[$key] = $value;
+            $this -> interfaces[$key] = $value;
         }
+        return $this;
     }
 
     /**
      * 设置存储实例
      * @param $object
+     * @return $this
      */
-    public static function set_storage($object)
+    public function set_storage($object)
     {
-        self::$storage = $object;
+        $this -> storage = $object;
+        return $this;
     }
 
     /**
      * 获取存储实例
      * @return null|object
      */
-    public static function get_storage()
+    public function get_storage()
     {
-        return self::$storage;
+        return $this -> storage;
     }
 
     /**
      * 获取session 操作实例
      * @return null|object
      */
-    public static function get_example()
+    public function get_example()
     {
-        return self::$example;
+        return $this -> example;
     }
 
     /**
      * 设置session 名称
      * @param $name
+     * @return $this
      */
-    public static function set_session_name($name)
+    public function set_session_name($name)
     {
-        self::$name = $name;
+        $this -> name = $name;
+        return $this;
     }
 
     /**
      * 获取session 名称
      * @return string
      */
-    public static function get_session_name()
+    public function get_session_name()
     {
-        return self::$name;
+        return $this -> name;
     }
 
     /**
      * 设置请求 (swoole 模式下才用的到)
      * @param $request
-     * @return mixed
+     * @return $this
      */
-    public static function set_request($request)
+    public function set_request($request)
     {
-        return self::$request = $request;
+        $this -> request = $request;
+        return $this;
     }
 
     /**
      * 获取请求 (swoole 模式下才用的到)
      * @return null|object
      */
-    public static function get_request()
+    public function get_request()
     {
-        return self::$request;
+        return $this -> request;
     }
 
     /**
      * 设置响应 (swoole 模式下才用的到)
      * @param $response
-     * @return mixed
+     * @return $this
      */
-    public static function set_response($response)
+    public function set_response($response)
     {
-        return self::$response = $response;
+        $this -> response = $response;
+        return $this;
     }
 
     /**
      * 获取响应 (swoole 模式下才用的到)
      * @return null|object
      */
-    public static function get_response()
+    public function get_response()
     {
-        return self::$response;
+        return $this -> response;
     }
 }
