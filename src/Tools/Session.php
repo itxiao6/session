@@ -8,7 +8,6 @@ use Itxiao6\Session\Interfaces\Storage;
  */
 class Session
 {
-
     /**
      * Session ID
      * @var string
@@ -58,7 +57,8 @@ class Session
      * @param int $number
      * @return bool|string
      */
-    protected static function getARandLetter($number = 1) {
+    protected static function getARandLetter($number = 1)
+    {
         # 判断长度是否为0
         if ($number == 0){return false;}
         # 如果小于零取正值
