@@ -80,6 +80,8 @@ class Session
 
     /**
      * 启动会话
+     * @return mixed
+     * @throws \Exception
      */
     public function start()
     {
@@ -101,11 +103,18 @@ class Session
         if($this -> expire() < time()){
             $this -> expire($this -> expire());
         }
+        /**
+         * 获取接口实例类
+         */
         $class = $this -> config('interfaces')[$this -> config('driver')];
-        $this -> example = new $class($this);
-        # 设置session_id 到cookie
+        /**
+         * 设置session_id 到cookie
+         */
         $this -> response -> RawResponse() -> cookie($this -> session_name(),$this -> session_id(),$this -> expire(),$this -> path());
-        return $this;
+        /**
+         * 实例化接口 并且返回实例
+         */
+        return $this -> example = new $class($this,...func_get_args());
     }
 
     /**

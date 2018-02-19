@@ -9,25 +9,22 @@ interface Storage
 {
     /**
      * 获取session 数据
-     * @param $session_id
      * @return mixed
      */
-    public function get($session_id);
+    public function get();
 
     /**
      * 写入session
-     * @param $session_id
      * @param $data
      * @return mixed
      */
-    public function set($session_id,$data);
+    public function set($data);
 
     /**
      * 销毁session
-     * @param $session_id
      * @return mixed
      */
-    public function destroy($session_id);
+    public function destroy();
 
     /**
      * 垃圾回收机制
