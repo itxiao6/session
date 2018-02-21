@@ -200,9 +200,9 @@ class Session
      * @param $driverName
      * @return Session
      */
-    public function driver($driverName,$driverClass = null)
+    public function driver($driverName = null)
     {
-        if($driverClass === null){
+        if($driverName === null){
             return $this -> config('driver');
         }else{
             return $this -> config('driver',$driverName);

@@ -14,24 +14,79 @@ class Redis implements Storage
      */
     protected $redis = null;
     /**
-     * 读取session 数据
-     * @param $session_id
-     * @return mixed
+     * session 实例
+     * @var null|object
      */
-    public function get($session_id)
+    protected $session = null;
+    /**
+     * session 数据
+     * @var null
+     */
+    protected $data = null;
+    /**
+     * 读取session 数据
+     * @param null $name
+     * @return bool|mixed|null
+     */
+    public function get($name=null)
     {
-        return unserialize($this -> redis -> get("session_".$session_id));
+        /**
+         * 判断是否要获取数据
+         */
+        if($this -> data === null){
+            # 判断session文件是否存在
+            if($this -> redis -> exists("session_".$this -> session_id())){
+                # 获取session 数据
+                $this -> data = unserialize($this -> redis -> get("session_".$this -> session_id()));
+            }else{
+                return null;
+            }
+        }
+        /**
+         * 判断是否过期
+         */
+        if($this -> data['expire'] <= time()){
+            $this -> destroy();
+            return false;
+        }
+        /**
+         * 判断是否要取全部的数据
+         */
+        if($name === null){
+            return $data['data'];
+        }
+        /**
+         * 返回要获取的数据
+         */
+        return isset($this -> data['data'][$name])?$this -> data['data'][$name]:null;
     }
 
     /**
      * 写入session
-     * @param $session_id
      * @param $data
-     * @return bool|int
+     * @return bool|int|mixed
      */
-    public function set($session_id,$data)
+    public function set($key,$data = null)
     {
-        return $this -> redis -> set("session_".$session_id,serialize($data),Session::get_expire());
+        /**
+         * 判断session目录是否存在
+         */
+        if(!is_dir($this -> path)){
+            mkdir($this -> path,'0777',true);
+        }
+        /**
+         * 判断是否要写入键=>值
+         */
+        if(is_string($key)){
+            $this -> data = ['data'=>[$key=>$data],'expire'=>$this -> expire()];
+        }
+        /**
+         * 判断是否要直接写入一个数据
+         */
+        if(is_array($key)){
+            $this -> data = ['data'=>$key,'expire'=>$this -> expire()];
+        }
+        return $this -> redis -> set("session_".$this -> session_id(),serialize($this -> data),$this -> expire());
     }
     /**
      * 垃圾回收
@@ -47,42 +102,36 @@ class Redis implements Storage
      * @param $session_id
      * @return bool
      */
-    public function destroy($session_id)
+    public function destroy()
     {
-        return $this -> redis -> delete("session_".$session_id);
-    }
-
-    /**
-     * 连接redis
-     * @param $host
-     * @param $port
-     * @param $pwd
-     * @return \Redis
-     */
-    protected function connection($host,$port,$pwd)
-    {
-        if(!$this -> redis -> ping()){
-            $redis = new \Redis();
-            return $redis -> connect($host,$port);
-        }else{
-            return $this -> redis;
-        }
+        return $this -> redis -> delete("session_".$this -> session_id());
     }
 
     /**
      * 实例化存储器
-     * @param null $redis
-     * @param string $host
-     * @param int $port
-     * @param null $pwd
+     * Redis constructor.
+     * @param $session
+     * @param \Redis $redis
      */
-    public function __construct($redis=null,$host='127.0.0.1',$port = 6379,$pwd = null)
+    public function __construct($session,\Redis $redis)
     {
-        # 判断是否需要连接
-        if($redis != null || (!$redis -> ping())){
-            $redis = $this -> connection($host,$port,$pwd);
-        }
-        # 设置连接
+        /**
+         * 获取session 实例
+         */
+        $this -> session = $session;
+        /**
+         * 获取redis 连接
+         */
         $this -> redis = $redis;
+    }
+    /**
+     * 调用不存在的方法
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        return $this -> session -> $name(...$arguments);
     }
 }
