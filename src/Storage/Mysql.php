@@ -22,6 +22,11 @@ class Mysql implements Storage
      * @var string
      */
     protected $table = 'session';
+    /**
+     * 会话数据
+     * @var mixed
+     */
+    protected $data = null;
 
     /**
      * 建表语句
@@ -41,13 +46,9 @@ class Mysql implements Storage
      * Mysql 存储器
      * Mysql constructor.
      * @param null $pdo
-     * @param string $dns
-     * @param string $user
-     * @param string $password
      * @param null $table_name
-     * @throws Exception
      */
-    public function __construct($pdo=null,$dns = '',$user = '',$password = '',$table_name = null)
+    public function __construct($pdo=null,$table_name = null)
     {
         /**
          * 判断是否自定义了表
@@ -55,21 +56,14 @@ class Mysql implements Storage
         if($table_name!=null){
             $this -> table = $table_name;
         }
-        if($pdo != null){
-            /**
-             * 直接设置PDO
-             */
-            $this -> connect = $pdo;
-        }else{
-            /**
-             * 创建PDO 连接
-             */
-            $this -> connection($dns,$user,$password);
-        }
+        /**
+         * 设置PDO
+         */
+        $this -> connect = $pdo;
         /**
          * 查询当前表
          */
-        $result = $pdo->query("SHOW TABLES LIKE '". $this -> table."'");
+        $result = $pdo -> query("SHOW TABLES LIKE '". $this -> table."'");
         /**
          * 解析结果集
          */
@@ -86,100 +80,106 @@ class Mysql implements Storage
     }
 
     /**
-     * 创建PDO连接
-     * @param $dns
-     * @param $user
-     * @param $pwd
-     * @throws Exception
-     */
-    protected function connection($dns,$user,$pwd) {
-        try {
-            $this -> connect = new PDO($dns, $user, $pwd, array(
-                PDO::ATTR_PERSISTENT => true,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ));
-        } catch (Exception $e) {
-            throw new Exception($e ->getMessage(),$e->getCode(),$e-> getPrevious());
-        }
-    }
-    /**
      * 获取session 数据
-     * @param $session_id
-     * @return null|string
+     * @param null $name
+     * @return bool|mixed|null
      */
-    public function get($session_id)
+    public function get($name=null)
     {
-        try {
-            /**
-             * 获取当前时间
-             */
-            $time = time();
-            /**
-             * 定义sql语句
-             */
-            $sql = "SELECT count(*) AS 'count' FROM ".$this -> table
-                ." WHERE skey = ? and expire > ?";
-            /**
-             * 预编译sql
-             */
-            $stmt = $this -> connect -> prepare($sql);
-            /**
-             * 执行sql
-             */
-            $stmt->execute([$session_id, $time]);
-            /**
-             * 解析结果集
-             */
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
-            /**
-             * 判断数据是否存在
-             */
-            if ($data['count'] = 0) {
-                return null;
+        /**
+         * 判断是否要获取数据
+         */
+        if($this -> data === null){
+            try {
+                /**
+                 * 定义sql语句
+                 */
+                $sql = "SELECT count(*) AS 'count' FROM ".$this -> table
+                    ." WHERE skey = ? and expire > ?";
+                /**
+                 * 预编译sql
+                 */
+                $stmt = $this -> connect -> prepare($sql);
+                /**
+                 * 执行sql
+                 */
+                $stmt->execute([$this -> session_id(), time()]);
+                /**
+                 * 解析结果集
+                 */
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                /**
+                 * 判断数据是否存在
+                 */
+                if ($data['count'] = 0) {
+                    return null;
+                }
+                /**
+                 * 定义sql 语句
+                 */
+                $sql = "SELECT data FROM {$this ->table} WHERE skey = ? and expire > ?";
+                /**
+                 * 预编译sql
+                 */
+                $stmt = $this -> connect -> prepare($sql);
+                /**
+                 * 执行sql
+                 */
+                $stmt->execute([$this -> session_id(), $time]);
+                /**
+                 * 解析结果集
+                 */
+                $data = $stmt -> fetch(PDO::FETCH_ASSOC);
+                /**
+                 * 判断是否要返回数据
+                 */
+                if($data != false){
+                    $this -> data = $data['data'];
+                }
+            } catch (Exception $e) {
+
             }
-            /**
-             * 定义sql 语句
-             */
-            $sql = "SELECT data FROM {$this ->table} WHERE skey = ? and expire > ?";
-            /**
-             * 预编译sql
-             */
-            $stmt = $this -> connect -> prepare($sql);
-            /**
-             * 执行sql
-             */
-            $stmt->execute([$session_id, $time]);
-            /**
-             * 解析结果集
-             */
-            $data = $stmt -> fetch(PDO::FETCH_ASSOC);
-            /**
-             * 判断是否要返回数据
-             */
-            if($data == false){
-                return null;
-            }else{
-                return unserialize($data['data']);
-            }
-        } catch (Exception $e) {
-            return null;
         }
+        /**
+         * 判断是否过期
+         */
+        if((!isset($this -> data['expire'])) || $this -> data['expire'] <= time()){
+            $this -> destroy();
+            return false;
+        }
+        /**
+         * 判断是否要取全部的数据
+         */
+        if($name === null){
+            return $data['data'];
+        }
+        /**
+         * 返回要获取的数据
+         */
+        return isset($this -> data['data'][$name])?$this -> data['data'][$name]:null;
     }
 
     /**
      * 设置session数据
-     * @param $session_id
-     * @param $data
-     * @return bool
+     * @param $key
+     * @param null $data
+     * @return bool|mixed
      */
-    public function set($session_id,$data)
+    public function set($key,$data = null)
     {
+        /**
+         * 判断是否要写入键=>值
+         */
+        if(is_string($key)){
+            $this -> data = ['data'=>[$key=>$data],'expire'=>$this -> expire()];
+        }
+        /**
+         * 判断是否要直接写入一个数据
+         */
+        if(is_array($key)){
+            $this -> data = ['data'=>$key,'expire'=>$this -> expire()];
+        }
         try {
-            /**
-             * 获取过期时间
-             */
-            $expire = Session::get_expire();
             /**
              * 定义Sql 语句
              */
@@ -188,23 +188,21 @@ class Mysql implements Storage
             /**
              * 预编译sql
              */
-            $stmt = $this -> connect ->prepare($sql);
+            $stmt = $this -> connect -> prepare($sql);
             /**
              * 执行sql
              */
-            return (Bool) $stmt -> execute([$session_id, serialize($data), $expire, serialize($data), $expire]);
+            return (Bool) $stmt -> execute([$this -> session_id(), serialize($this -> data), $this -> expire(), serialize($this -> data), $this -> expire()]);
         } catch (Exception $e) {
-            var_dump($e -> getMessage());
             return false;
         }
     }
 
     /**
      * 销毁session
-     * @param $session_id
-     * @return bool
+     * @return bool|mixed
      */
-    public function destroy($session_id)
+    public function destroy()
     {
         try {
             /**
@@ -218,7 +216,7 @@ class Mysql implements Storage
             /**
              * 执行sql 语句
              */
-            $stmt->execute([$session_id]);
+            $stmt->execute([$this -> session_id()]);
             /**
              * 返回结果
              */
@@ -255,5 +253,15 @@ class Mysql implements Storage
         } catch (Exception $e) {
             return false;
         }
+    }
+    /**
+     * 调用不存在的方法
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        return $this -> session -> $name(...$arguments);
     }
 }

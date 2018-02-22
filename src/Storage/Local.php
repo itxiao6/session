@@ -49,7 +49,7 @@ class Local implements Storage
         /**
          * 判断是否过期
          */
-        if($this -> data['expire'] <= time()){
+        if((!isset($this -> data['expire'])) || $this -> data['expire'] <= time()){
             $this -> destroy();
             return false;
         }
