@@ -25,7 +25,7 @@ class Session
         'interfaces'=>[
             'Local'=>\Itxiao6\Session\Storage\Local::class,
             'Redis'=>\Itxiao6\Session\Storage\Redis::class,
-            'Mysql'=>\Itxiao6\Session\Storage\Mysql::class
+            'MySql'=>\Itxiao6\Session\Storage\Mysql::class
         ],
     ];
     /**
