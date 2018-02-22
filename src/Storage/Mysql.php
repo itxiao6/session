@@ -27,6 +27,11 @@ class Mysql implements Storage
      * @var mixed
      */
     protected $data = null;
+    /**
+     * session 实例
+     * @var null | object
+     */
+    protected $session = null;
 
     /**
      * 建表语句
@@ -45,11 +50,16 @@ class Mysql implements Storage
     /**
      * Mysql 存储器
      * Mysql constructor.
+     * @param $session
      * @param null $pdo
      * @param null $table_name
      */
-    public function __construct($pdo=null,$table_name = null)
+    public function __construct($session,$pdo=null,$table_name = null)
     {
+        /**
+         * 获取session 实例
+         */
+        $this -> session = $session;
         /**
          * 判断是否自定义了表
          */
@@ -67,7 +77,7 @@ class Mysql implements Storage
         /**
          * 解析结果集
          */
-        $row = $result->fetchAll();
+        $row = $result -> fetchAll();
         /**
          * 判断表名是否存在
          */
@@ -125,7 +135,7 @@ class Mysql implements Storage
                 /**
                  * 执行sql
                  */
-                $stmt->execute([$this -> session_id(), $time]);
+                $stmt->execute([$this -> session_id(), time()]);
                 /**
                  * 解析结果集
                  */
@@ -134,10 +144,12 @@ class Mysql implements Storage
                  * 判断是否要返回数据
                  */
                 if($data != false){
-                    $this -> data = $data['data'];
+                    $this -> data = unserialize($data['data']);
+                }else{
+                    $this -> data = null;
                 }
             } catch (Exception $e) {
-
+                $this -> data = null;
             }
         }
         /**
