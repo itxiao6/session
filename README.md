@@ -1,5 +1,5 @@
 # session
-##### 基于Cookie 重写了PHP自带的 SESSION 机制，存储介质支持:本地模式、Mysql、Redis php运行模式支持:LAMP、LNMP、SWOOLE
+##### 基于Cookie 重写了PHP自带的 SESSION 机制，存储介质支持:本地模式、Mysql、Redis,php运行模式支持:LAMP、LNMP、SWOOLE
 ## 1.引入入口
 ```php
 use \Itxiao6\Session\Session;
@@ -39,7 +39,7 @@ var_dump($session -> get('name'));
 ```
 
 ```php
-# 设置新的存储器
+# 设置新的存储器 备注 Driver::class 必须继承 Itxiao6\Session\Interfaces\Storage
 Session::getInterface() -> interface('Memcache',Driver::class);
 $memcache = Memcache();
 $memcache -> connect('127.0.0.1', 11211); 
@@ -54,9 +54,9 @@ Session::getInterface() -> interface('Memcache',Driver::class) -> driver('Memcac
   $http = new swoole_http_server('0.0.0.0', 80, SWOOLE_BASE);
   // 监听request 事件
   $http->on('request', function(swoole_http_request $request, swoole_http_response $response){
-    # 启动会话
+    // 启动会话
     $session = Session::getInterface($request,$response) -> start(__DIR__.'/'.'SessionFile/');
-    # 设置值
+    // 设置值
     $session -> set('name','戒尺');
     // 获取值 输出Hello World session 内的name值
     $res->write("hello world:".$session -> get('name'));
