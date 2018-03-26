@@ -163,7 +163,7 @@ class Mysql implements Storage
          * 判断是否要取全部的数据
          */
         if($name === null){
-            return $data['data'];
+            return isset($this -> data['data'])?$this -> data['data']:null;
         }
         /**
          * 返回要获取的数据
