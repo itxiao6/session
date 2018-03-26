@@ -46,20 +46,33 @@ class Session
 
     /**
      * 构造方法
+     * Session constructor.
+     * @param null $request
+     * @param null $response
      */
-    protected function __construct($request,$response)
+    protected function __construct($request = null,$response = null)
     {
-        # 设置请求
+        /**
+         * 设置请求
+         */
         $this -> request = $request;
-        # 设置响应
+        /**
+         * 设置响应
+         */
         $this -> response = $response;
-        # 判断是否已经设置了 session 有效期
+        /**
+         * 判断是否已经设置了 session 有效期
+         */
         if($this -> config('session_expire') < 1){
             $this -> config('session_expire',604800);
         }
-        # 获取请求内的session id
+        /**
+         * 获取请求内的session id
+         */
         $session_id = isset($request -> RawRequest() -> cookie[$this -> config('session_name')])?$request -> RawRequest() -> cookie[$this -> config('session_name')]:false;
-        # 判断是否需要重置 session id
+        /**
+         * 判断是否需要重置 session id
+         */
         if(in_array($session_id,[null,false,''])){
             $this -> session_id(self::getARandLetter(30));
         }else{
@@ -86,16 +99,16 @@ class Session
     public function start()
     {
         /**
-         * 判断session id 是否存在
-         */
-        if($this -> config('session_id') === null){
-            $this -> reset_session_id();
-        }
-        /**
          * 实例化存储器
          */
         if($this -> is_start){
             throw new \Exception('会话已经启动');
+        }
+        /**
+         * 判断session id 是否存在
+         */
+        if($this -> config('session_id') === null){
+            $this -> reset_session_id();
         }
         /**
          * 判断有效期是否小于当前时间
@@ -108,9 +121,16 @@ class Session
          */
         $class = $this -> config('interfaces')[$this -> config('driver')];
         /**
-         * 设置session_id 到cookie
+         * 判断是否为 cli swoole 模式
          */
-        $this -> response -> RawResponse() -> cookie($this -> session_name(),$this -> session_id(),$this -> expire(),$this -> path());
+        if(PHP_SAPI === 'cli'){
+            /**
+             * 设置session_id 到cookie
+             */
+            $this -> response -> RawResponse() -> cookie($this -> session_name(),$this -> session_id(),$this -> expire(),$this -> path());
+        }else{
+            setcookie($this -> session_name(),$this -> session_id(),$this -> expire(),$this -> path());
+        }
         /**
          * 实例化接口 并且返回实例
          */
@@ -215,7 +235,7 @@ class Session
      * @param null $value
      * @return $this
      */
-    public function interface($key = null,$value = null)
+    public function interfaces($key = null,$value = null)
     {
         if(is_string($key) && $value === null){
             return $this -> config('interfaces')[$key];
