@@ -53,12 +53,6 @@ class Http
      */
     public function setCookie($name, $value = "", $expire = 0, $path = "", $domain = "", $secure = false, $httponly = false)
     {
-        if($expire < 1){
-            $expire = time()+$this -> config -> get('session_expire');
-        }
-        if($path == ''){
-            $path = '/';
-        }
-        return setcookie($name,$value,$expire,$path);
+        return setcookie(...func_get_args());
     }
 }

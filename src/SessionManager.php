@@ -41,6 +41,16 @@ class SessionManager
      * @var null
      */
     protected static $session_interface = null;
+    /**
+     * 请求
+     * @var \swoole_http_request
+     */
+    protected $request;
+    /**
+     * 响应句柄
+     * @var \swoole_http_response
+     */
+    protected $response;
 
     /**
      * 单例获取 swoole 模式的实例
@@ -54,7 +64,7 @@ class SessionManager
         /**
          * 判断是否已经实例化过session
          */
-        if(self::$session_swoole_interface){
+        if(!self::$session_swoole_interface){
             self::$session_swoole_interface = new static($request,$response);
         }
         return self::$session_swoole_interface;
@@ -70,7 +80,7 @@ class SessionManager
         /**
          * 判断是否已经实例化过session
          */
-        if(self::$session_interface){
+        if(!self::$session_interface){
             self::$session_interface = new static();
         }
         return self::$session_interface;
@@ -85,42 +95,9 @@ class SessionManager
     protected function __construct($request = null,$response = null)
     {
         /**
-         * 判断是否为SWOOLE
-         */
-        if($request != null && $response != null){
-            /**
-             * 判断参数是否合法
-             */
-            if($request instanceof \swoole_http_request && $response instanceof \swoole_http_response){
-                /**
-                 * 实例化swoole
-                 */
-                $this -> http = (new Swoole()) -> request($request) -> response($response);
-            }else{
-                throw new \Exception('Request or Response invalid');
-            }
-        }else{
-            /**
-             * 实例化php-fpm模式的工具
-             */
-            $this -> http = (new Http());
-        }
-        /**
          * 实例化配置实例
          */
         $this -> config = new Config();
-//        /**
-//         * 获取请求内的session id
-//         */
-//        $session_id = isset($request -> RawRequest() -> cookie[$this -> config('session_name')])?$request -> RawRequest() -> cookie[$this -> config('session_name')]:false;
-//        /**
-//         * 判断是否需要重置 session id
-//         */
-//        if(in_array($session_id,[null,false,''])){
-//            $this -> session_id(self::getARandLetter(30));
-//        }else{
-//            $this -> session_id($session_id);
-//        }
     }
 
     /**
@@ -128,6 +105,17 @@ class SessionManager
      * @return Config|null
      */
     public function config(){return $this -> config;}
+
+    /**
+     * 设置配置实例
+     * @param Config $config
+     * @return $this
+     */
+    public function set_config(Config $config)
+    {
+        $this -> config = $config;
+        return $this;
+    }
 
     /**
      * http
@@ -156,11 +144,32 @@ class SessionManager
 
     /**
      * 启动会话
-     * @return mixed
+     * @return $this
      * @throws \Exception
      */
     public function start()
     {
+        /**
+         * 判断是否为SWOOLE
+         */
+        if($this -> request != null && $this -> response != null){
+            /**
+             * 判断参数是否合法
+             */
+            if($this -> request instanceof \swoole_http_request && $this -> response instanceof \swoole_http_response){
+                /**
+                 * 实例化swoole
+                 */
+                $this -> http = (new Swoole($this -> config)) -> request($this -> request) -> response($this -> response);
+            }else{
+                throw new \Exception('Request or Response invalid');
+            }
+        }else{
+            /**
+             * 实例化php-fpm模式的工具
+             */
+            $this -> http = (new Http($this -> config));
+        }
         /**
          * 启动会话
          */

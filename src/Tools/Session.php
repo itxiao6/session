@@ -44,7 +44,11 @@ class Session
         /**
          * 实例化存储器
          */
-        $this -> storage = new Storage($manager -> get_driver());
+        $this -> storage = new Storage($manager -> get_driver(),$this -> manager -> config());
+        /**
+         * 获取session_id
+         */
+        $this -> get_session_id();
     }
 
     /**
@@ -74,6 +78,10 @@ class Session
         }else if($this -> manager -> config() -> get('session_id_type') == Config::TYPE_NUMBER){
             $this -> set_session_id(Random::randNumStr($this -> manager -> config() -> get('session_id_length')));
         }
+        /**
+         * 设置cookie
+         */
+        $this -> manager -> http() -> setCookie($this -> manager -> config() -> get('session_name'),$this -> session_id,$this -> manager -> config() -> get('session_expire') + time());
         /**
          * 返回会话 id
          */
@@ -131,6 +139,9 @@ class Session
      */
     public function save()
     {
+        /**
+         * 保存数据
+         */
         return $this -> storage -> write($this -> session_id,$this -> data);
     }
 
