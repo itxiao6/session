@@ -44,6 +44,6 @@ class Storage
     }
     public function write($session_id,$data):bool
     {
-        return$this -> driver -> save($this -> config -> get('session_storage_prefix').$session_id,serialize($data));
+        return$this -> driver -> save($this -> config -> get('session_storage_prefix').$session_id,serialize($data),$this -> config -> get('session_expire'));
     }
 }

@@ -26,8 +26,8 @@ class Config
         'session_id_length'=>32,
         'session_id_type'=>1,
         'session_storage_prefix'=>'itxiao6_session_',
-        // 默认一周的有效期
-        'session_expire'=>null,
+        // 默认有效期一天
+        'session_expire'=>3600*24,
     ];
 
     /**

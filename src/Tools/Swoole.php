@@ -17,6 +17,10 @@ class Swoole
      * @var null|\swoole_http_response
      */
     protected $response = null;
+    /**
+     * @var Config
+     */
+    protected $config;
 
     /**
      * 设置请求
@@ -76,6 +80,12 @@ class Swoole
      */
     public function setCookie($name, $value = "", $expire = 0, $path = "", $domain = "", $secure = false, $httponly = false)
     {
-        return $this -> response -> cookie(...func_get_args());
+        if($expire < 1){
+            $expire = time()+$this -> config -> get('session_expire');
+        }
+        if($path == ''){
+            $path = '/';
+        }
+        return $this -> response -> cookie($name,$value,$expire,$path);
     }
 }

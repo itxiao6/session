@@ -7,9 +7,19 @@ namespace Itxiao6\Session\Tools;
  */
 class Http
 {
-    public function __construct()
-    {
+    /**
+     * @var Config
+     */
+    protected $config;
 
+    /**
+     * http 构造器
+     * Http constructor.
+     * @param Config $config
+     */
+    public function __construct(Config $config)
+    {
+        $this -> config = $config;
     }
 
     /**
@@ -43,6 +53,12 @@ class Http
      */
     public function setCookie($name, $value = "", $expire = 0, $path = "", $domain = "", $secure = false, $httponly = false)
     {
-        return setcookie(...func_get_args());
+        if($expire < 1){
+            $expire = time()+$this -> config -> get('session_expire');
+        }
+        if($path == ''){
+            $path = '/';
+        }
+        return setcookie($name,$value,$expire,$path);
     }
 }
