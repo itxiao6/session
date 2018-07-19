@@ -1,65 +1,85 @@
 # session
-##### 基于Cookie 重写了PHP自带的 SESSION 机制，存储介质支持:本地模式、Mysql、Redis,php运行模式支持:LAMP、LNMP、SWOOLE
-## 1.引入入口
+##### 重写了PHP自带的 SESSION 机制，存储介质支持:本地模式、Memcache、Redis、Mamcached、Xcache,php运行模式支持:LAMP、LNMP、SWOOLE
+## 1.引入入口 && 获取实例
 ```php
-use \Itxiao6\Session\Session;
+use \Itxiao6\Session\SessionManager;
+$session = \Itxiao6\Session\SessionManager::getSessionInterface();
 ```
-## 2.启动会话
+## 2.设置驱动
 ### 1.本地存储方式(默认)
 ```php
-// 设置使用的存储介质
-Session::driver(); // 默认为 Local
-// 启动会话
-Session::getInterface() -> start(__DIR__.'/SessionFile/');
+$session -> set_deiver(new \Doctrine\Common\Cache\FilesystemCache(__DIR__.DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR));
 ```
-### 2.MySql存储介质
-```php
-$pdo = new \PDO("mysql:host=127.0.0.1;dbname=dbname",'username','passwd');
-$session = Session::getInterface() -> driver('MySql') -> start($pdo,'session_table');
-```
-### 3.Redis存储介质
+### 2.Redis 驱动
 ```php
 $redis = new \Redis();
-$redis -> connect('127.0.0.1',6379);
-# 启动会话
-$session = Session::getInterface() -> driver('Redis') -> start($redis);
-```
-### 4.使用Session
-```php
-# 设置值
-$session -> set('name','戒尺');
-# 获取值
-var_dump($session -> get('name'));
-```
-#### 更多存储机制可以无限扩展和替换
-###### 备注
-```text
-1.存储器必须继承:Itxiao6\Session\Interfaces\Storage 接口
-2.Session::interface('DriverName',Driver::class) -> driver('DriverName');的参数会传递到存储器的构造方法内,所有开发存储器只需要在构造方法获取连接 即可 
-```
+$redis->connect('127.0.0.1', 6319);
+$cacheDriver = new \Doctrine\Common\Cache\RedisCache();
+$cacheDriver->setRedis($redis);
 
+$session -> set_deiver($cacheDriver);
+```
+### 3.Memcache 驱动
 ```php
-# 设置新的存储器 备注 Driver::class 必须继承 Itxiao6\Session\Interfaces\Storage
-Session::getInterface() -> interface('Memcache',Driver::class);
-$memcache = Memcache();
-$memcache -> connect('127.0.0.1', 11211); 
-use \Itxiao6\Session\Session;
-// 设置存储介质 并启动会话
-Session::getInterface() -> interface('Memcache',Driver::class) -> driver('Memcache') -> start($memcache);
+$memcache = new \Memcache();
+$memcache->connect('127.0.0.1', 11211);
+
+$cacheDriver = new \Doctrine\Common\Cache\MemcacheCache();
+$cacheDriver->setMemcache($memcache);
+$session -> set_deiver($cacheDriver);
+```
+### 4.Memcached 驱动
+```php
+$memcached = new \Memcached();
+$memcached->addServer($cacheConfig['Mamcached']['host'], $cacheConfig['Mamcached']['port']);
+
+$cacheDriver = new \Doctrine\Common\Cache\MemcachedCache();
+$cacheDriver->setMemcached($memcached);
+$session -> set_deiver($cacheDriver);
+```
+### 5.Xcache 驱动
+```php
+$session -> set_deiver(new \Doctrine\Common\Cache\XcacheCache());
+```
+### 6.传入配置
+```php
+$session -> set_config(new \Itxiao6\Session\Tools\Config([
+    'session_name'=>'PHPSESSION',
+    'session_path'=>'/',
+    'session_id_length'=>32,
+    'session_id_type'=>1,
+    'session_storage_prefix'=>'itxiao6_session_',
+    // 默认有效期一天
+    'session_expire'=>3600*24,
+]));
+```
+### 7.启动会话
+```php
+try{
+    // 启动会话
+    $session -> start();
+}catch (\Throwable $exception){
+    // 打印错误
+    var_dump($exception);
+}
+```
+### 8.设置值
+```php
+$session -> session() -> set('name','戒尺');
+```
+### 9.设置值
+```php
+echo $session -> session() -> get('name');
 ```
 #### 附录1
-  SWOOLE 模式使用方式 操作和 驱动和上文使用方法一样，唯一的区别就是 调用 Session::getInterface()的时候需要传入 $request 和 $response
+  SWOOLE 模式使用方式 操作和 驱动和上文使用方法一样，唯一的区别就是 步骤使用1的时候调用的"getSessionInterface" 改为"getSwooleSessionInterface" 并且传入 $request 和 $response
 ```php
    // 创建http server
   $http = new swoole_http_server('0.0.0.0', 80, SWOOLE_BASE);
   // 监听request 事件
   $http->on('request', function(swoole_http_request $request, swoole_http_response $response){
-    // 启动会话
-    $session = Session::getInterface($request,$response) -> start(__DIR__.'/'.'SessionFile/');
-    // 设置值
-    $session -> set('name','戒尺');
-    // 获取值 输出Hello World session 内的name值
-    $res->write("hello world:".$session -> get('name'));
+    // 启动会话(步骤一)
+    $session = Session::getSwooleSessionInterface($request,$response);
     // 结束请求
     $res->end();
   });
