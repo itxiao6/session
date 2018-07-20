@@ -98,6 +98,14 @@ class SessionManager
          * 实例化配置实例
          */
         $this -> config = new Config();
+        /**
+         * 获取请求实例
+         */
+        $this -> request = $request;
+        /**
+         * 获取响应句柄
+         */
+        $this -> response = $response;
     }
 
     /**

@@ -55,7 +55,7 @@ class Session
      * 获取会话id
      * @return null|string
      */
-    protected function get_session_id()
+    public function get_session_id()
     {
         /**
          * 判断客户端是否有session_id
@@ -110,8 +110,9 @@ class Session
      * @param $name
      * @return null
      */
-    public function get($name)
+    public function get($name = null)
     {
+        if($name === null){return $this -> data;}
         $path = explode('.',$name);
         $value = $this -> data;
         foreach ($path as $item){
@@ -127,10 +128,12 @@ class Session
      * 设置session 指定的数据
      * @param $name
      * @param $value
+     * @return $this
      */
     public function set($name,$value)
     {
         $this -> data[$name] = $value;
+        return $this;
     }
 
     /**

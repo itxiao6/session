@@ -74,15 +74,48 @@ echo $session -> session() -> get('name');
 #### 附录1
   SWOOLE 模式使用方式 操作和 驱动和上文使用方法一样，唯一的区别就是 步骤使用1的时候调用的"getSessionInterface" 改为"getSwooleSessionInterface" 并且传入 $request 和 $response
 ```php
-   // 创建http server
-  $http = new swoole_http_server('0.0.0.0', 80, SWOOLE_BASE);
-  // 监听request 事件
-  $http->on('request', function(swoole_http_request $request, swoole_http_response $response){
-    // 启动会话(步骤一)
-    $session = Session::getSwooleSessionInterface($request,$response);
-    // 结束请求
-    $res->end();
-  });
+// 创建http server
+$http = new \swoole_http_server('0.0.0.0', 9501, SWOOLE_BASE);
+// 监听request 事件
+$http->on('request', function(\swoole_http_request $request, \swoole_http_response $response){
+    /**
+     * 获取Swoole 会话
+     */
+    $session = \Itxiao6\Session\SessionManager::getSwooleSessionInterface($request,$response);
+
+    /**
+     * 设置驱动（文件驱动）
+     */
+    $session -> set_deiver(new \Doctrine\Common\Cache\FilesystemCache(__DIR__.DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR));
+    /**
+     * 设置配置实例
+     */
+    $session -> set_config(new \Itxiao6\Session\Tools\Config());
+    /**
+     * 启动会话
+     */
+    try{
+        $session -> start();
+    }catch (\Throwable $exception){
+        var_dump($exception);
+    }
+    /**
+     * 设置一个值 到session 里
+     */
+    $session -> session() -> set('user_info',['nickname'=>'戒尺','phone'=>'15538147923','sub'=>['id'=>1]]) -> save();
+    /**
+     * 获取session 里的一个值
+     */
+    $response -> write(json_encode($session -> session() -> get('user_info')));
+    /**
+     * 结束请求
+     */
+    $response -> end();
+});
+/**
+ * 启动http server
+ */
+$http -> start();
 ```
 
  

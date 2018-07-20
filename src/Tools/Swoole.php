@@ -29,7 +29,7 @@ class Swoole
      */
     public function request($request = null)
     {
-        if($request === null){
+        if($request != null){
             $this -> request = $request;
             return $this;
         }
@@ -41,9 +41,9 @@ class Swoole
      * @param $response
      * @return $this|null|\swoole_http_response
      */
-    public function response($response)
+    public function response($response = null)
     {
-        if($response === null){
+        if($response != null){
             $this -> response = $response;
             return $this;
         }
@@ -80,12 +80,6 @@ class Swoole
      */
     public function setCookie($name, $value = "", $expire = 0, $path = "", $domain = "", $secure = false, $httponly = false)
     {
-        if($expire < 1){
-            $expire = time()+$this -> config -> get('session_expire');
-        }
-        if($path == ''){
-            $path = '/';
-        }
-        return $this -> response -> cookie($name,$value,$expire,$path);
+        return $this -> response -> cookie(...func_get_args());
     }
 }
