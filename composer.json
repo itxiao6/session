@@ -1,7 +1,7 @@
 {
   "name": "itxiao6/session",
-  "description": "minkenrel session",
-  "keywords": ["minkernel","session", "validation", "file"],
+  "description": "重写了PHP自带的 SESSION 机制，存储介质支持:本地模式、Memcache、Redis、Mamcached、Xcache,php运行模式支持:LAMP、LNMP、SWOOLE",
+  "keywords": ["SESSION共享","SESSION集群", "Redis", "SWOOLE","SESSION"],
   "homepage": "http://github.com/itxiao6/session",
   "license": "MIT",
   "authors": [
